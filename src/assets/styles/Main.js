@@ -1,0 +1,105 @@
+const Main = {
+    container: {
+        flexGrow: 1,
+        justifyContent: "center",
+        padding: 25,
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: "bold",
+        marginBottom: 20,
+        textAlign: "center",
+    },
+    form: {
+        borderColor: "#e6007e",
+        borderWidth: 1,
+        padding: 20,
+        borderRadius: 15,
+        position: "relative",
+        marginTop: 10,
+    },
+    formTitle: {
+        position: "absolute",
+        top: -12,
+        alignSelf: "center",
+        paddingHorizontal: 12,
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    inputContainer: {
+        marginTop: 25,
+        position: "relative",
+    },
+    input: {
+        borderBottomWidth: 1,
+        borderBottomColor: "#e6007e",
+        paddingHorizontal: 5,
+        paddingTop: 18,
+        paddingBottom: 8,
+        fontSize: 16,
+        backgroundColor: "transparent",
+    },
+    button: {
+        backgroundColor: "#e6007e",
+        padding: 15,
+        borderRadius: 10,
+        marginTop: 35,
+        alignItems: "center",
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    link: {
+        marginTop: 15,
+        textAlign: "center",
+        fontSize: 14,
+    },
+    logo: {
+        width: 160,
+        height: 160,
+        alignSelf: "center",
+        marginBottom: 20,
+        resizeMode: "contain",
+    },
+    dividerContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 25,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: "#e6007e",
+        opacity: 0.5,
+    },
+    dividerText: {
+        marginHorizontal: 10,
+        color: "#e6007e",
+        fontSize: 14,
+        fontWeight: "bold",
+    },
+    socialContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginTop: 20,
+        gap: 20,
+    },
+    socialButton: {
+        width: 55,
+        height: 55,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#e6007e",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    socialIcon: {
+        width: 30,
+        height: 30,
+        resizeMode: "contain",
+    },
+}
+
+export default Main;
