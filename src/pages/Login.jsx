@@ -51,7 +51,7 @@ function FloatingInput({
     };
 
     const inputBg = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.05)";
-    const labelBg = isDark ? "#808080" : "#f1f5f930";
+    const labelBg = isDark ? "#808080" : "#ffffff00";
 
     const labelStyle = {
         position: "absolute",
@@ -114,6 +114,14 @@ export default function Login() {
         alert("Login correcto (simulado)");
     };
 
+    const handleGoogleLogin = () => {
+        alert("Login con Google (pendiente)");
+    };
+
+    const handleFacebookLogin = () => {
+        alert("Login con Facebook (pendiente)");
+    };
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -123,7 +131,7 @@ export default function Login() {
                 <ScrollView
                     contentContainerStyle={[
                         styles.container,
-                        { backgroundColor: isDark ? "#808080" : "#f1f5f9" },
+                        { backgroundColor: isDark ? "#808080" : "#fff" },
                     ]}
                     keyboardShouldPersistTaps="handled"
                 >
@@ -136,40 +144,78 @@ export default function Login() {
                         Tu lugar perfecto a un click de distancia
                     </Text>
 
-                    <Text style={[styles.subtitle, { color: "#e6007e" }]}>
-                        Iniciar Sesión
-                    </Text>
-
-                    <FloatingInput
-                        label="Usuario"
-                        value={usuario}
-                        onChangeText={setUsuario}
-                        isDark={isDark}
-                    />
-
-                    <FloatingInput
-                        label="Contraseña"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                        isDark={isDark}
-                    />
-
-                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                        <Text style={styles.buttonText}>Entrar</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity>
-                        <Text style={[styles.link, { color: "#e6007e" }]}>
-                            ¿Olvidaste tu contraseña?
+                    <View style={styles.form}>
+                        <Text
+                            style={[
+                                styles.formTitle,
+                                {
+                                    backgroundColor: isDark ? "#808080" : "#fff",
+                                    color: "#e6007e",
+                                },
+                            ]}
+                        >
+                            Iniciar Sesión
                         </Text>
-                    </TouchableOpacity>
 
-                    <TouchableOpacity>
-                        <Text style={[styles.link, { color: "#e6007e" }]}>
-                            Crear cuenta
-                        </Text>
-                    </TouchableOpacity>
+                        <FloatingInput
+                            label="Usuario"
+                            value={usuario}
+                            onChangeText={setUsuario}
+                            isDark={isDark}
+                        />
+
+                        <FloatingInput
+                            label="Contraseña"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            isDark={isDark}
+                        />
+
+                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                            <Text style={styles.buttonText}>Entrar</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity>
+                            <Text style={[styles.link, { color: "#e6007e" }]}>
+                                ¿Olvidaste tu contraseña?
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity>
+                            <Text style={[styles.link, { color: "#e6007e" }]}>
+                                Crear cuenta
+                            </Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.dividerContainer}>
+                            <View style={styles.dividerLine} />
+                            <Text style={styles.dividerText}>o</Text>
+                            <View style={styles.dividerLine} />
+                        </View>
+
+                        <View style={styles.socialContainer}>
+                            <TouchableOpacity
+                                style={styles.socialButton}
+                                onPress={handleGoogleLogin}
+                            >
+                                <Image
+                                    source={require("../../assets/icons/google.png")}
+                                    style={styles.socialIcon}
+                                />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.socialButton}
+                                onPress={handleFacebookLogin}
+                            >
+                                <Image
+                                    source={require("../../assets/icons/fb.png")}
+                                    style={styles.socialIcon}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </ScrollView>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -183,15 +229,26 @@ const styles = StyleSheet.create({
         padding: 25,
     },
     title: {
-        fontSize: 34,
+        fontSize: 22,
         fontWeight: "bold",
-        marginBottom: 10,
+        marginBottom: 20,
         textAlign: "center",
     },
-    subtitle: {
+    form: {
+        borderColor: "#e6007e",
+        borderWidth: 1,
+        padding: 20,
+        borderRadius: 15,
+        position: "relative",
+        marginTop: 10,
+    },
+    formTitle: {
+        position: "absolute",
+        top: -12,
+        alignSelf: "center",
+        paddingHorizontal: 12,
         fontSize: 16,
-        marginBottom: 30,
-        textAlign: "center",
+        fontWeight: "bold",
     },
     inputContainer: {
         marginTop: 20,
@@ -223,10 +280,47 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     logo: {
-        width: 180,
-        height: 180,
+        width: 160,
+        height: 160,
         alignSelf: "center",
         marginBottom: 20,
+        resizeMode: "contain",
+    },
+    dividerContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 25,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: "#e6007e",
+        opacity: 0.5,
+    },
+    dividerText: {
+        marginHorizontal: 10,
+        color: "#e6007e",
+        fontSize: 14,
+        fontWeight: "bold",
+    },
+    socialContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginTop: 20,
+        gap: 20,
+    },
+    socialButton: {
+        width: 55,
+        height: 55,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#e6007e",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    socialIcon: {
+        width: 30,
+        height: 30,
         resizeMode: "contain",
     },
 });
