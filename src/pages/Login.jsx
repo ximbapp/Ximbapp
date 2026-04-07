@@ -1,12 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
-    TextInput,
     TouchableOpacity,
     StyleSheet,
     useColorScheme,
-    Animated,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -15,88 +13,9 @@ import {
     Keyboard,
 } from "react-native";
 
-function FloatingInput({
-    label,
-    value,
-    onChangeText,
-    secureTextEntry,
-    isDark,
-}) {
-    const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
+import FloatingInput from "../components/FloatingInput";
 
-    useEffect(() => {
-        Animated.timing(animatedValue, {
-            toValue: value ? 1 : 0,
-            duration: 150,
-            useNativeDriver: false,
-        }).start();
-    }, [value]);
-
-    const handleFocus = () => {
-        Animated.timing(animatedValue, {
-            toValue: 1,
-            duration: 150,
-            useNativeDriver: false,
-        }).start();
-    };
-
-    const handleBlur = () => {
-        if (!value) {
-            Animated.timing(animatedValue, {
-                toValue: 0,
-                duration: 150,
-                useNativeDriver: false,
-            }).start();
-        }
-    };
-
-    const labelBg = isDark ? "#808080" : "#fff";
-
-    const labelStyle = {
-        position: "absolute",
-        left: 0,
-        paddingHorizontal: 4,
-        backgroundColor: labelBg,
-        color: "#e6007e",
-        top: animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [18, -10],
-        }),
-        fontSize: animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [16, 12],
-        }),
-        zIndex: 10,
-    };
-
-    return (
-        <View style={styles.inputContainer}>
-            <Animated.Text style={labelStyle}>{label}</Animated.Text>
-
-            <TextInput
-                style={[
-                    styles.input,
-                    {
-                        color: "#e6007e",
-                        borderBottomColor: "#e6007e",
-                    },
-                ]}
-                value={value}
-                onChangeText={onChangeText}
-                secureTextEntry={secureTextEntry}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                autoCapitalize="none"
-                textContentType={secureTextEntry ? "password" : "none"}
-                autoComplete={secureTextEntry ? "password" : "off"}
-                importantForAutofill="yes"
-                placeholderTextColor="rgba(230,0,126,0.6)"
-            />
-        </View>
-    );
-}
-
-export default function Login() {
+const Login = ({ navigation }) => {
     const scheme = useColorScheme();
     const isDark = scheme === "dark";
 
@@ -131,14 +50,14 @@ export default function Login() {
                         styles.container,
                         { backgroundColor: isDark ? "#808080" : "#fff" },
                     ]}
-                    keyboardShouldPersistTaps="handled"
+                    keyboardShouldPersistTaps="always"
                 >
                     <Image
                         source={require("../../assets/images/Ximbapp.png")}
                         style={styles.logo}
                     />
 
-                    <Text style={[styles.title, { color: "#e6007e" }]}>
+                    <Text style={styles.title}>
                         Tu lugar perfecto a un click de distancia
                     </Text>
 
@@ -146,10 +65,7 @@ export default function Login() {
                         <Text
                             style={[
                                 styles.formTitle,
-                                {
-                                    backgroundColor: isDark ? "#808080" : "#fff",
-                                    color: "#e6007e",
-                                },
+                                { backgroundColor: isDark ? "#808080" : "#fff" },
                             ]}
                         >
                             Iniciar Sesión
@@ -175,15 +91,11 @@ export default function Login() {
                         </TouchableOpacity>
 
                         <TouchableOpacity>
-                            <Text style={[styles.link, { color: "#e6007e" }]}>
-                                ¿Olvidaste tu contraseña?
-                            </Text>
+                            <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity>
-                            <Text style={[styles.link, { color: "#e6007e" }]}>
-                                Crear cuenta
-                            </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
+                            <Text style={styles.link}>Crear cuenta</Text>
                         </TouchableOpacity>
 
                         <View style={styles.dividerContainer}>
@@ -218,7 +130,7 @@ export default function Login() {
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -231,6 +143,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 20,
         textAlign: "center",
+        color: "#e6007e",
     },
     form: {
         borderColor: "#e6007e",
@@ -247,19 +160,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         fontSize: 16,
         fontWeight: "bold",
-    },
-    inputContainer: {
-        marginTop: 25,
-        position: "relative",
-    },
-    input: {
-        borderBottomWidth: 1,
-        borderBottomColor: "#e6007e",
-        paddingHorizontal: 5,
-        paddingTop: 18,
-        paddingBottom: 8,
-        fontSize: 16,
-        backgroundColor: "transparent",
+        color: "#e6007e",
     },
     button: {
         backgroundColor: "#e6007e",
@@ -277,6 +178,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
         textAlign: "center",
         fontSize: 14,
+        color: "#e6007e",
     },
     logo: {
         width: 160,
@@ -323,3 +225,5 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
     },
 });
+
+export default Login;

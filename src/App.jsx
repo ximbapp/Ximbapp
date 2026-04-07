@@ -1,6 +1,21 @@
 import React from "react";
-import Login from "./pages/Login.jsx";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-export default function App() {
-    return <Login />;
-}
+import Login from "./pages/Login";
+import Registro from "./pages/Registro";
+
+const Stack = createNativeStackNavigator();
+
+const App = () => {
+    return (
+        <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="Registro" component={Registro} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+};
+
+export default App;
