@@ -50,18 +50,17 @@ function FloatingInput({
         }
     };
 
-    const inputBg = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.05)";
-    const labelBg = isDark ? "#808080" : "#ffffff00";
+    const labelBg = isDark ? "#808080" : "#fff";
 
     const labelStyle = {
         position: "absolute",
-        left: 12,
-        paddingHorizontal: 6,
+        left: 0,
+        paddingHorizontal: 4,
         backgroundColor: labelBg,
         color: "#e6007e",
         top: animatedValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [16, -18],
+            outputRange: [18, -10],
         }),
         fontSize: animatedValue.interpolate({
             inputRange: [0, 1],
@@ -78,9 +77,8 @@ function FloatingInput({
                 style={[
                     styles.input,
                     {
-                        backgroundColor: inputBg,
                         color: "#e6007e",
-                        borderColor: "#e6007e",
+                        borderBottomColor: "#e6007e",
                     },
                 ]}
                 value={value}
@@ -251,22 +249,23 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     inputContainer: {
-        marginTop: 20,
+        marginTop: 25,
         position: "relative",
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 10,
-        paddingHorizontal: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: "#e6007e",
+        paddingHorizontal: 5,
         paddingTop: 18,
-        paddingBottom: 10,
+        paddingBottom: 8,
         fontSize: 16,
+        backgroundColor: "transparent",
     },
     button: {
         backgroundColor: "#e6007e",
         padding: 15,
         borderRadius: 10,
-        marginTop: 30,
+        marginTop: 35,
         alignItems: "center",
     },
     buttonText: {
