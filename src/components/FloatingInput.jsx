@@ -1,12 +1,11 @@
 import React, { useRef, useEffect } from "react";
 import { View, TextInput, StyleSheet, Animated } from "react-native";
 
-
 const FloatingInput = ({
     label,
     value,
     onChangeText,
-    secureTextEntry = false,
+    secureTextEntry,
     isDark,
 }) => {
     const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
@@ -61,10 +60,16 @@ const FloatingInput = ({
             <Animated.Text style={labelStyle}>{label}</Animated.Text>
 
             <TextInput
-                style={styles.input}
+                style={[
+                    styles.input,
+                    {
+                        color: "#e6007e",
+                        borderBottomColor: "#e6007e",
+                    },
+                ]}
                 value={value}
                 onChangeText={onChangeText}
-                secureTextEntry={!!secureTextEntry}
+                secureTextEntry={secureTextEntry}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 autoCapitalize="none"
@@ -81,13 +86,11 @@ const styles = StyleSheet.create({
     },
     input: {
         borderBottomWidth: 2,
-        borderBottomColor: "#e6007e",
         paddingHorizontal: 5,
         paddingTop: 18,
         paddingBottom: 8,
         fontSize: 16,
         backgroundColor: "transparent",
-        color: "#e6007e",
     },
 });
 

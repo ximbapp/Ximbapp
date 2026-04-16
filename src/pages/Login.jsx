@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
-    useColorScheme,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -14,13 +13,12 @@ import {
 } from "react-native";
 
 import FloatingInput from "../components/FloatingInput";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Login = ({ navigation }) => {
-    const scheme = useColorScheme();
-    const isDark = scheme === "dark";
+    const { isDark } = useContext(ThemeContext);
 
-    const [email, setEmail] = useState("");
+    const [usuario, setUsuario] = useState("");
     const [password, setPassword] = useState("");
 
     const handleLogin = () => {
@@ -29,7 +27,7 @@ const Login = ({ navigation }) => {
             return;
         }
 
-        alert("Login correcto (simulado)");
+        navigation.replace("Home");
     };
 
     const handleGoogleLogin = () => {
@@ -58,9 +56,7 @@ const Login = ({ navigation }) => {
                         style={styles.logo}
                     />
 
-                    <Text style={styles.title}>
-                        Tu lugar perfecto a un click de distancia
-                    </Text>
+                    <Text style={styles.title}>Tu lugar perfecto a un click de distancia</Text>
 
                     <View style={styles.form}>
                         <Text
@@ -73,9 +69,9 @@ const Login = ({ navigation }) => {
                         </Text>
 
                         <FloatingInput
-                            label="Email"
-                            value={email}
-                            onChangeText={setEmail}
+                            label="Usuario"
+                            value={usuario}
+                            onChangeText={setUsuario}
                             isDark={isDark}
                         />
 
@@ -110,21 +106,21 @@ const Login = ({ navigation }) => {
                                 style={styles.socialButton}
                                 onPress={handleGoogleLogin}
                             >
-                                <Text>
-                                    <AntDesign name="google" size={35} color="#DB4437" />
-                                </Text>
+                                <Image
+                                    source={require("../../assets/icons/google.png")}
+                                    style={styles.socialIcon}
+                                />
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={styles.socialButton}
                                 onPress={handleFacebookLogin}
                             >
-                                <Text>
-                                    <MaterialIcons name="facebook" size={35} color="#1877F2" />
-                                </Text>
+                                <Image
+                                    source={require("../../assets/icons/fb.png")}
+                                    style={styles.socialIcon}
+                                />
                             </TouchableOpacity>
-
-
                         </View>
                     </View>
                 </ScrollView>
@@ -132,6 +128,8 @@ const Login = ({ navigation }) => {
         </KeyboardAvoidingView>
     );
 };
+
+export default Login;
 
 const styles = StyleSheet.create({
     container: {
@@ -219,7 +217,10 @@ const styles = StyleSheet.create({
         borderColor: "#e6007e",
         justifyContent: "center",
         alignItems: "center",
-    }
+    },
+    socialIcon: {
+        width: 30,
+        height: 30,
+        resizeMode: "contain",
+    },
 });
-
-export default Login;

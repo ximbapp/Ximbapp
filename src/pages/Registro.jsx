@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
-    useColorScheme,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -14,10 +13,10 @@ import {
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import FloatingInput from "../components/FloatingInput";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Registro = ({ navigation }) => {
-    const scheme = useColorScheme();
-    const isDark = scheme === "dark";
+    const { isDark } = useContext(ThemeContext);
 
     const [nombre, setNombre] = useState("");
     const [apellido_pa, setApellido_pa] = useState("");
@@ -32,7 +31,6 @@ const Registro = ({ navigation }) => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    // 📌 FECHA
     const [fechaNacimiento, setFechaNacimiento] = useState(null);
     const [showPicker, setShowPicker] = useState(false);
 
@@ -46,6 +44,8 @@ const Registro = ({ navigation }) => {
 
     const handleFechaChange = (event, selectedDate) => {
         setShowPicker(false);
+
+        if (event.type === "dismissed") return;
 
         if (selectedDate) {
             setFechaNacimiento(selectedDate);
@@ -126,7 +126,6 @@ const Registro = ({ navigation }) => {
                             isDark={isDark}
                         />
 
-                        {/* 📌 FECHA CON CALENDARIO */}
                         <TouchableOpacity onPress={() => setShowPicker(true)}>
                             <View pointerEvents="none">
                                 <FloatingInput
@@ -227,6 +226,8 @@ const Registro = ({ navigation }) => {
     );
 };
 
+export default Registro;
+
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -275,5 +276,3 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 });
-
-export default Registro;
