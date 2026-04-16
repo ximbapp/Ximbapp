@@ -14,12 +14,13 @@ import {
 } from "react-native";
 
 import FloatingInput from "../components/FloatingInput";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 
 const Login = ({ navigation }) => {
     const scheme = useColorScheme();
     const isDark = scheme === "dark";
 
-    const [usuario, setUsuario] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleLogin = () => {
@@ -72,9 +73,9 @@ const Login = ({ navigation }) => {
                         </Text>
 
                         <FloatingInput
-                            label="Usuario"
-                            value={usuario}
-                            onChangeText={setUsuario}
+                            label="Email"
+                            value={email}
+                            onChangeText={setEmail}
                             isDark={isDark}
                         />
 
@@ -109,21 +110,21 @@ const Login = ({ navigation }) => {
                                 style={styles.socialButton}
                                 onPress={handleGoogleLogin}
                             >
-                                <Image
-                                    source={require("../../assets/icons/google.png")}
-                                    style={styles.socialIcon}
-                                />
+                                <Text>
+                                    <AntDesign name="google" size={35} color="#DB4437" />
+                                </Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={styles.socialButton}
                                 onPress={handleFacebookLogin}
                             >
-                                <Image
-                                    source={require("../../assets/icons/fb.png")}
-                                    style={styles.socialIcon}
-                                />
+                                <Text>
+                                    <MaterialIcons name="facebook" size={35} color="#1877F2" />
+                                </Text>
                             </TouchableOpacity>
+
+
                         </View>
                     </View>
                 </ScrollView>
@@ -218,12 +219,7 @@ const styles = StyleSheet.create({
         borderColor: "#e6007e",
         justifyContent: "center",
         alignItems: "center",
-    },
-    socialIcon: {
-        width: 30,
-        height: 30,
-        resizeMode: "contain",
-    },
+    }
 });
 
 export default Login;

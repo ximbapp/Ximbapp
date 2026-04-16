@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { View, TextInput, StyleSheet, Animated } from "react-native";
 
+
 const FloatingInput = ({
     label,
     value,
