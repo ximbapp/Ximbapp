@@ -22,9 +22,42 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [errors, setErrors] = useState({});
+
+    const validarEmail = (correo) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(correo);
+    };
+
+    const clearError = (campo) => {
+        setErrors((prev) => ({ ...prev, [campo]: "" }));
+    };
+
     const handleLogin = () => {
-        if (email.trim() === "" || password.trim() === "") {
-            alert("Completa todos los campos");
+        let newErrors = {};
+
+        if (email.trim() === "") {
+            newErrors.email = "El correo es obligatorio";
+        } else if (!validarEmail(email.trim())) {
+            newErrors.email = "Ingresa un correo válido (ejemplo@correo.com)";
+        }
+
+        if (password.trim() === "") {
+            newErrors.password = "La contraseña es obligatoria";
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) return;
+
+        const usuarioCorrecto = "miguel@gmail.com";
+        const passwordCorrecto = "Miguel123!";
+
+        if (email.trim() !== usuarioCorrecto || password !== passwordCorrecto) {
+            setErrors({
+                email: "Correo o contraseña incorrectos",
+                password: "Correo o contraseña incorrectos",
+            });
             return;
         }
 
@@ -39,91 +72,104 @@ const Login = ({ navigation }) => {
         alert("Login con Facebook (pendiente)");
     };
 
+    const content = (
+        <ScrollView
+            contentContainerStyle={[
+                styles.container,
+                { backgroundColor: isDark ? "#000" : "#fff" },
+            ]}
+            keyboardShouldPersistTaps="always"
+        >
+            <Image
+                source={require("../../assets/images/Ximbapp.png")}
+                style={styles.logo}
+            />
+
+            <Text style={styles.title}>Tu lugar perfecto a un click de distancia</Text>
+
+            <View style={styles.form}>
+                <Text
+                    style={[
+                        styles.formTitle,
+                        { backgroundColor: isDark ? "#000" : "#fff" },
+                    ]}
+                >
+                    Iniciar Sesión
+                </Text>
+
+                <FloatingInput
+                    label="Email"
+                    value={email}
+                    onChangeText={(text) => {
+                        setEmail(text);
+                        clearError("email");
+                    }}
+                    isDark={isDark}
+                    error={errors.email}
+                    keyboardType="email-address"
+                />
+
+                <FloatingInput
+                    label="Contraseña"
+                    value={password}
+                    onChangeText={(text) => {
+                        setPassword(text);
+                        clearError("password");
+                    }}
+                    secureTextEntry
+                    isDark={isDark}
+                    error={errors.password}
+                />
+
+                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                    <Text style={styles.buttonText}>Entrar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity>
+                    <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
+                    <Text style={styles.link}>Crear cuenta</Text>
+                </TouchableOpacity>
+
+                <View style={styles.dividerContainer}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>o</Text>
+                    <View style={styles.dividerLine} />
+                </View>
+
+                <View style={styles.socialContainer}>
+                    <TouchableOpacity
+                        style={styles.socialButton}
+                        onPress={handleGoogleLogin}
+                    >
+                        <Ionicons name="logo-google" size={35} color="#DB4437" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.socialButton}
+                        onPress={handleFacebookLogin}
+                    >
+                        <Ionicons name="logo-facebook" size={40} color="#4267B2" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </ScrollView>
+    );
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <ScrollView
-                    contentContainerStyle={[
-                        styles.container,
-                        { backgroundColor: isDark ? "#808080" : "#fff" },
-                    ]}
-                    keyboardShouldPersistTaps="always"
-                >
-                    <Image
-                        source={require("../../assets/images/Ximbapp.png")}
-                        style={styles.logo}
-                    />
-
-                    <Text style={styles.title}>Tu lugar perfecto a un click de distancia</Text>
-
-                    <View style={styles.form}>
-                        <Text
-                            style={[
-                                styles.formTitle,
-                                { backgroundColor: isDark ? "#808080" : "#fff" },
-                            ]}
-                        >
-                            Iniciar Sesión
-                        </Text>
-
-                        <FloatingInput
-                            label="Email"
-                            value={email}
-                            onChangeText={setEmail}
-                            isDark={isDark}
-                        />
-
-                        <FloatingInput
-                            label="Contraseña"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                            isDark={isDark}
-                        />
-
-                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                            <Text style={styles.buttonText}>Entrar</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity>
-                            <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
-                            <Text style={styles.link}>Crear cuenta</Text>
-                        </TouchableOpacity>
-
-                        <View style={styles.dividerContainer}>
-                            <View style={styles.dividerLine} />
-                            <Text style={styles.dividerText}>o</Text>
-                            <View style={styles.dividerLine} />
-                        </View>
-
-                        <View style={styles.socialContainer}>
-                            <TouchableOpacity
-                                style={styles.socialButton}
-                                onPress={handleGoogleLogin}
-                            >
-                                <Text>
-                                    <Ionicons name="logo-google" size={35} color="#DB4437" />
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={styles.socialButton}
-                                onPress={handleFacebookLogin}
-                            >
-                                <Text>
-                                    <Ionicons name="logo-facebook" size={40} color="#4267B2" />
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </ScrollView>
-            </TouchableWithoutFeedback>
+            {Platform.OS === "web" ? (
+                content
+            ) : (
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    {content}
+                </TouchableWithoutFeedback>
+            )}
         </KeyboardAvoidingView>
     );
 };
@@ -216,10 +262,5 @@ const styles = StyleSheet.create({
         borderColor: "#e6007e",
         justifyContent: "center",
         alignItems: "center",
-    },
-    socialIcon: {
-        width: 30,
-        height: 30,
-        resizeMode: "contain",
     },
 });

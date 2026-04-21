@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, TextInput, StyleSheet, Animated } from "react-native";
+import { View, TextInput, StyleSheet, Animated, Text } from "react-native";
 
 const FloatingInput = ({
     label,
@@ -7,6 +7,9 @@ const FloatingInput = ({
     onChangeText,
     secureTextEntry,
     isDark,
+    error,
+    keyboardType,
+    maxLength,
 }) => {
     const animatedValue = useRef(new Animated.Value(value ? 1 : 0)).current;
 
@@ -36,14 +39,14 @@ const FloatingInput = ({
         }
     };
 
-    const labelBg = isDark ? "#808080" : "#fff";
+    const labelBg = isDark ? "#00000000" : "#fff";
 
     const labelStyle = {
         position: "absolute",
         left: 0,
         paddingHorizontal: 4,
         backgroundColor: labelBg,
-        color: "#e6007e",
+        color: error ? "#ff3b30" : "#e6007e",
         top: animatedValue.interpolate({
             inputRange: [0, 1],
             outputRange: [18, -10],
@@ -64,7 +67,7 @@ const FloatingInput = ({
                     styles.input,
                     {
                         color: "#e6007e",
-                        borderBottomColor: "#e6007e",
+                        borderBottomColor: error ? "#ff3b30" : "#e6007e",
                     },
                 ]}
                 value={value}
@@ -74,7 +77,11 @@ const FloatingInput = ({
                 onBlur={handleBlur}
                 autoCapitalize="none"
                 placeholderTextColor="rgba(230,0,126,0.6)"
+                keyboardType={keyboardType}
+                maxLength={maxLength}
             />
+
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
     );
 };
@@ -91,6 +98,12 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
         fontSize: 16,
         backgroundColor: "transparent",
+    },
+    errorText: {
+        marginTop: 6,
+        color: "#ff3b30",
+        fontSize: 12,
+        fontWeight: "bold",
     },
 });
 
