@@ -14,6 +14,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const Registro = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);
@@ -78,6 +79,14 @@ const Registro = ({ navigation }) => {
 
         alert("Cuenta creada correctamente (simulado)");
         navigation.goBack();
+    };
+
+    const handleGoogleLogin = () => {
+        alert("Login con Google (pendiente)");
+    };
+
+    const handleFacebookLogin = () => {
+        alert("Login con Facebook (pendiente)");
     };
 
     return (
@@ -219,6 +228,32 @@ const Registro = ({ navigation }) => {
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Text style={styles.link}>Ya tengo cuenta</Text>
                         </TouchableOpacity>
+
+                        <View style={styles.dividerContainer}>
+                            <View style={styles.dividerLine} />
+                            <Text style={styles.dividerText}>o</Text>
+                            <View style={styles.dividerLine} />
+                        </View>
+
+                        <View style={styles.socialContainer}>
+                            <TouchableOpacity
+                                style={styles.socialButton}
+                                onPress={handleGoogleLogin}
+                            >
+                                <Text>
+                                    <Ionicons name="logo-google" size={35} color="#DB4437" />
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.socialButton}
+                                onPress={handleFacebookLogin}
+                            >
+                                <Text>
+                                    <Ionicons name="logo-facebook" size={40} color="#4267B2" />
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </ScrollView>
             </TouchableWithoutFeedback>
@@ -232,14 +267,14 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         justifyContent: "center",
-        padding: 25,
+        padding: 30,
     },
     title: {
         fontSize: 28,
         fontWeight: "bold",
         color: "#e6007e",
         textAlign: "center",
-        marginBottom: 25,
+        marginBottom: 22,
     },
     form: {
         borderColor: "#e6007e",
@@ -274,5 +309,42 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: "#e6007e",
         fontSize: 14,
+    },
+    dividerContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 25,
+    },
+    dividerLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: "#e6007e",
+        opacity: 0.5,
+    },
+    dividerText: {
+        marginHorizontal: 10,
+        color: "#e6007e",
+        fontSize: 14,
+        fontWeight: "bold",
+    },
+    socialContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        marginTop: 20,
+        gap: 20,
+    },
+    socialButton: {
+        width: 55,
+        height: 55,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#e6007e",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    socialIcon: {
+        width: 30,
+        height: 30,
+        resizeMode: "contain",
     },
 });

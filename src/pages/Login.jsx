@@ -14,15 +14,16 @@ import {
 
 import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const Login = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);
 
-    const [usuario, setUsuario] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handleLogin = () => {
-        if (usuario.trim() === "" || password.trim() === "") {
+        if (email.trim() === "" || password.trim() === "") {
             alert("Completa todos los campos");
             return;
         }
@@ -69,9 +70,9 @@ const Login = ({ navigation }) => {
                         </Text>
 
                         <FloatingInput
-                            label="Usuario"
-                            value={usuario}
-                            onChangeText={setUsuario}
+                            label="Email"
+                            value={email}
+                            onChangeText={setEmail}
                             isDark={isDark}
                         />
 
@@ -106,20 +107,18 @@ const Login = ({ navigation }) => {
                                 style={styles.socialButton}
                                 onPress={handleGoogleLogin}
                             >
-                                <Image
-                                    source={require("../../assets/icons/google.png")}
-                                    style={styles.socialIcon}
-                                />
+                                <Text>
+                                    <Ionicons name="logo-google" size={35} color="#DB4437" />
+                                </Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={styles.socialButton}
                                 onPress={handleFacebookLogin}
                             >
-                                <Image
-                                    source={require("../../assets/icons/fb.png")}
-                                    style={styles.socialIcon}
-                                />
+                                <Text>
+                                    <Ionicons name="logo-facebook" size={40} color="#4267B2" />
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>
