@@ -17,6 +17,8 @@ import { ThemeContext } from "../context/ThemeContext";
 const Home = ({ navigation }) => {
     const { themeMode, setThemeMode, isDark } = useContext(ThemeContext);
 
+    const mapRef = useRef(null);
+
     const [location, setLocation] = useState({
         latitude: 19.4326,
         longitude: -99.1332,
@@ -26,19 +28,50 @@ const Home = ({ navigation }) => {
     const slideAnim = useRef(new Animated.Value(300)).current;
 
     useEffect(() => {
-        const getLocation = async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") return;
+        let subscription;
 
-            const loc = await Location.getCurrentPositionAsync({});
-            setLocation({
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
-            });
+        const startTracking = async () => {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                alert("Permiso de ubicación denegado");
+                return;
+            }
+
+            subscription = await Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    timeInterval: 1000,
+                    distanceInterval: 1,
+                },
+                (loc) => {
+                    setLocation({
+                        latitude: loc.coords.latitude,
+                        longitude: loc.coords.longitude,
+                    });
+                }
+            );
         };
 
-        getLocation();
+        startTracking();
+
+        return () => {
+            if (subscription) subscription.remove();
+        };
     }, []);
+
+    const centerLocation = () => {
+        if (mapRef.current) {
+            mapRef.current.animateToRegion(
+                {
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                },
+                600
+            );
+        }
+    };
 
     const openMenu = () => {
         setMenuVisible(true);
@@ -78,8 +111,11 @@ const Home = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <MapView
+                ref={mapRef}
                 style={styles.map}
                 mapType="none"
+                showsUserLocation={true}
+                showsMyLocationButton={false}
                 initialRegion={{
                     latitude: location.latitude,
                     longitude: location.longitude,
@@ -96,6 +132,11 @@ const Home = ({ navigation }) => {
                     maximumZ={19}
                 />
             </MapView>
+
+            {/* BOTÓN CENTRAR UBICACIÓN */}
+            <TouchableOpacity style={styles.locationButton} onPress={centerLocation}>
+                <MaterialIcons name="my-location" size={24} color="#fff" />
+            </TouchableOpacity>
 
             <View
                 style={[
@@ -194,6 +235,20 @@ const styles = StyleSheet.create({
     map: {
         flex: 1,
     },
+
+    locationButton: {
+        position: "absolute",
+        right: 20,
+        bottom: 95,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: "#e6007e",
+        alignItems: "center",
+        justifyContent: "center",
+        elevation: 5,
+    },
+
     bottomBar: {
         height: 70,
         flexDirection: "row",
