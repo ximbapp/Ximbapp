@@ -24,9 +24,20 @@ const Ajustes = ({ navigation }) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff" }]}>
+        <View
+            style={[
+                styles.container,
+                {
+                    backgroundColor: isDark ? "#3A3A46" : "#fff",
+                    alignItems: Platform.OS === "web" ? "center" : "stretch",
+                },
+            ]}
+        >
             <View style={styles.webWrapper}>
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                >
                     <MaterialIcons name="arrow-back" size={28} color="#e6007e" />
                 </TouchableOpacity>
 
@@ -39,7 +50,7 @@ const Ajustes = ({ navigation }) => {
                     <View
                         style={[
                             styles.card,
-                            { backgroundColor: isDark ? "#0a0a0a" : "#fff" },
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                         ]}
                     >
                         <Text style={styles.sectionTitle}>Modo Oscuro</Text>
@@ -72,7 +83,7 @@ const Ajustes = ({ navigation }) => {
                     <View
                         style={[
                             styles.card,
-                            { backgroundColor: isDark ? "#0a0a0a" : "#fff" },
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                         ]}
                     >
                         <Text style={styles.sectionTitle}>Idioma</Text>
@@ -97,7 +108,7 @@ const Ajustes = ({ navigation }) => {
                     <View
                         style={[
                             styles.card,
-                            { backgroundColor: isDark ? "#0a0a0a" : "#fff" },
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                         ]}
                     >
                         <Text style={styles.sectionTitle}>Notificaciones</Text>
@@ -120,7 +131,7 @@ const Ajustes = ({ navigation }) => {
                     <View
                         style={[
                             styles.card,
-                            { backgroundColor: isDark ? "#0a0a0a" : "#fff" },
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                         ]}
                     >
                         <Text style={styles.sectionTitle}>Unidades de longitud</Text>
@@ -145,7 +156,7 @@ const Ajustes = ({ navigation }) => {
                     <View
                         style={[
                             styles.card,
-                            { backgroundColor: isDark ? "#0a0a0a" : "#fff" },
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                         ]}
                     >
                         <Text style={styles.sectionTitle}>Historial</Text>
@@ -172,12 +183,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        alignItems: "center",
     },
 
     webWrapper: {
         width: "100%",
         maxWidth: Platform.OS === "web" ? 650 : "100%",
+        flex: 1,
     },
 
     scrollContainer: {

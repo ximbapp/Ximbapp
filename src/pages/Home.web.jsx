@@ -85,8 +85,7 @@ const Home = ({ navigation }) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? "#000" : "#fff" }]}>
-            {/* MAPA OSM */}
+        <View style={[styles.container, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
             <View style={styles.mapContainer}>
                 <iframe
                     title="OpenStreetMap"
@@ -101,16 +100,14 @@ const Home = ({ navigation }) => {
                 ></iframe>
             </View>
 
-            {/* BOTÓN CENTRAR UBICACIÓN */}
             <TouchableOpacity style={styles.locationButton} onPress={centerLocation}>
                 <MaterialIcons name="my-location" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {/* BARRA INFERIOR */}
             <View
                 style={[
                     styles.bottomBar,
-                    { backgroundColor: isDark ? "#0a0a0a" : "#ffffff" },
+                    { backgroundColor: isDark ? "#3A3A46" : "#ffffff" },
                 ]}
             >
                 <TouchableOpacity style={styles.sideButton} onPress={handleEventos}>
@@ -126,14 +123,13 @@ const Home = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
-            {/* MENÚ LATERAL */}
             {menuVisible && (
                 <Pressable style={styles.overlay} onPress={closeMenu}>
                     <Animated.View
                         style={[
                             styles.drawer,
                             {
-                                backgroundColor: isDark ? "#0a0a0a" : "#fff",
+                                backgroundColor: isDark ? "#3A3A46" : "#fff",
                                 transform: [{ translateX: slideAnim }],
                             },
                         ]}

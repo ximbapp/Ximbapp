@@ -39,7 +39,7 @@ const FloatingInput = ({
         }
     };
 
-    const labelBg = isDark ? "#00000000" : "#fff";
+    const labelBg = isDark ? "#3A3A46" : "#fff";
 
     const labelStyle = {
         position: "absolute",

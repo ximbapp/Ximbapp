@@ -6,13 +6,17 @@ import {
     TouchableOpacity,
     Animated,
     Pressable,
+    Modal,
+    TextInput,
+    ScrollView,
 } from "react-native";
 
-import MapView, { UrlTile } from "react-native-maps";
+import MapView, { UrlTile, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 import { Fontisto, Entypo, MaterialIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../context/ThemeContext";
+import { Picker } from "@react-native-picker/picker";
 
 const Home = ({ navigation }) => {
     const { themeMode, setThemeMode, isDark } = useContext(ThemeContext);
@@ -27,6 +31,127 @@ const Home = ({ navigation }) => {
     const [menuVisible, setMenuVisible] = useState(false);
     const slideAnim = useRef(new Animated.Value(300)).current;
 
+    const [searchModalVisible, setSearchModalVisible] = useState(false);
+    const [eventModalVisible, setEventModalVisible] = useState(false);
+
+    const [searchText, setSearchText] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
+
+    const [selectedPlace, setSelectedPlace] = useState(null);
+
+    const categorias = [
+        "Historia/Cultura",
+        "Religioso",
+        "Centros Recreativos",
+        "Eventos",
+        "Gastronomía",
+        "Aventura",
+    ];
+
+    const lugaresEjemplo = [
+        {
+            id: 1,
+            nombre: "Museo Nacional",
+            categoria: "Historia/Cultura",
+            descripcion: "Museo con exposiciones históricas.",
+            latitude: 19.4352,
+            longitude: -99.1412,
+        },
+        {
+            id: 2,
+            nombre: "Catedral Metropolitana",
+            categoria: "Religioso",
+            descripcion: "Uno de los lugares más icónicos.",
+            latitude: 19.4331,
+            longitude: -99.1339,
+        },
+        {
+            id: 3,
+            nombre: "Parque Chapultepec",
+            categoria: "Centros Recreativos",
+            descripcion: "Un parque enorme para caminar y pasear.",
+            latitude: 19.4204,
+            longitude: -99.1819,
+        },
+        {
+            id: 4,
+            nombre: "Festival Cultural",
+            categoria: "Eventos",
+            descripcion: "Evento cultural con música y arte.",
+            latitude: 19.4285,
+            longitude: -99.135,
+        },
+        {
+            id: 5,
+            nombre: "Tacos El Güero",
+            categoria: "Gastronomía",
+            descripcion: "Tacos tradicionales mexicanos.",
+            latitude: 19.4347,
+            longitude: -99.1298,
+        },
+        {
+            id: 6,
+            nombre: "Sendero Bosque",
+            categoria: "Aventura",
+            descripcion: "Ruta ideal para senderismo y aventura.",
+            latitude: 19.4108,
+            longitude: -99.2,
+        },
+    ];
+
+    // EVENTOS DE EJEMPLO (IMPORTANTE: deben tener lat/lng)
+    const eventosEjemplo = [
+        {
+            id: 1,
+            nombre: "Concierto en el Zócalo",
+            descripcion: "Evento musical gratuito en el centro.",
+            fecha: "28/04/2026 - 8:00 PM",
+            latitude: 19.4329,
+            longitude: -99.1333,
+        },
+        {
+            id: 2,
+            nombre: "Expo Cultura",
+            descripcion: "Exposición cultural y artesanal.",
+            fecha: "30/04/2026 - 12:00 PM",
+            latitude: 19.4255,
+            longitude: -99.1452,
+        },
+        {
+            id: 3,
+            nombre: "Feria Gastronómica",
+            descripcion: "Comida típica mexicana y bebidas.",
+            fecha: "02/05/2026 - 2:00 PM",
+            latitude: 19.4172,
+            longitude: -99.167,
+        },
+        {
+            id: 4,
+            nombre: "Carrera Recreativa",
+            descripcion: "Evento deportivo en Chapultepec.",
+            fecha: "03/05/2026 - 7:00 AM",
+            latitude: 19.4204,
+            longitude: -99.1819,
+        },
+    ];
+
+    // FUNCIÓN PARA CALCULAR DISTANCIA EN KM (Haversine)
+    const calcularDistanciaKm = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // radio tierra km
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
     useEffect(() => {
         let subscription;
 
@@ -40,8 +165,8 @@ const Home = ({ navigation }) => {
             subscription = await Location.watchPositionAsync(
                 {
                     accuracy: Location.Accuracy.High,
-                    timeInterval: 1000,
-                    distanceInterval: 1,
+                    timeInterval: 2000,
+                    distanceInterval: 2,
                 },
                 (loc) => {
                     setLocation({
@@ -73,6 +198,42 @@ const Home = ({ navigation }) => {
         }
     };
 
+    const centerToPlace = (place) => {
+        setSelectedPlace(place);
+
+        if (mapRef.current) {
+            mapRef.current.animateToRegion(
+                {
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                },
+                600
+            );
+        }
+
+        setSearchModalVisible(false);
+    };
+
+    const centerToEvent = (event) => {
+        setSelectedPlace(event);
+
+        if (mapRef.current) {
+            mapRef.current.animateToRegion(
+                {
+                    latitude: event.latitude,
+                    longitude: event.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                },
+                600
+            );
+        }
+
+        setEventModalVisible(false);
+    };
+
     const openMenu = () => {
         setMenuVisible(true);
         Animated.timing(slideAnim, {
@@ -90,8 +251,13 @@ const Home = ({ navigation }) => {
         }).start(() => setMenuVisible(false));
     };
 
-    const handleEventos = () => alert("Eventos (pendiente)");
-    const handleBuscar = () => alert("Buscar (pendiente)");
+    const handleEventos = () => {
+        setEventModalVisible(true);
+    };
+
+    const handleBuscar = () => {
+        setSearchModalVisible(true);
+    };
 
     const handlePerfil = () => {
         closeMenu();
@@ -107,6 +273,33 @@ const Home = ({ navigation }) => {
         closeMenu();
         navigation.replace("Login");
     };
+
+    const resultadosFiltrados = lugaresEjemplo.filter((lugar) => {
+        const coincideTexto =
+            searchText.trim() === "" ||
+            lugar.nombre.toLowerCase().includes(searchText.toLowerCase());
+
+        const coincideCategoria =
+            selectedCategory === "" || lugar.categoria === selectedCategory;
+
+        return coincideTexto && coincideCategoria;
+    });
+
+    const eventosOrdenados = eventosEjemplo
+        .map((evento) => {
+            const distancia = calcularDistanciaKm(
+                location.latitude,
+                location.longitude,
+                evento.latitude,
+                evento.longitude
+            );
+
+            return {
+                ...evento,
+                distancia,
+            };
+        })
+        .sort((a, b) => a.distancia - b.distancia);
 
     return (
         <View style={styles.container}>
@@ -131,6 +324,17 @@ const Home = ({ navigation }) => {
                     }
                     maximumZ={19}
                 />
+
+                {selectedPlace ? (
+                    <Marker
+                        coordinate={{
+                            latitude: selectedPlace.latitude,
+                            longitude: selectedPlace.longitude,
+                        }}
+                        title={selectedPlace.nombre}
+                        description={selectedPlace.descripcion}
+                    />
+                ) : null}
             </MapView>
 
             <TouchableOpacity style={styles.locationButton} onPress={centerLocation}>
@@ -140,7 +344,7 @@ const Home = ({ navigation }) => {
             <View
                 style={[
                     styles.bottomBar,
-                    { backgroundColor: isDark ? "#0a0a0a" : "#ffffff" },
+                    { backgroundColor: isDark ? "#3A3A46" : "#ffffff" },
                 ]}
             >
                 <TouchableOpacity style={styles.sideButton} onPress={handleEventos}>
@@ -156,13 +360,202 @@ const Home = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
+            {/* MODAL BUSCAR */}
+            <Modal
+                visible={searchModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setSearchModalVisible(false)}
+            >
+                <Pressable
+                    style={styles.modalOverlay}
+                    onPress={() => setSearchModalVisible(false)}
+                >
+                    <Pressable
+                        style={[
+                            styles.modalContent,
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
+                        ]}
+                    >
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Buscar</Text>
+
+                            <TouchableOpacity
+                                onPress={() => setSearchModalVisible(false)}
+                            >
+                                <MaterialIcons name="close" size={26} color="#e6007e" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={[
+                                    styles.searchInput,
+                                    {
+                                        backgroundColor: isDark
+                                            ? "#2C2C36"
+                                            : "#f5f5f5",
+                                        color: "#e6007e",
+                                    },
+                                ]}
+                                placeholder="Escribe lo que buscas..."
+                                placeholderTextColor="rgba(230,0,126,0.6)"
+                                value={searchText}
+                                onChangeText={setSearchText}
+                            />
+
+                            {searchText.trim() !== "" ? (
+                                <TouchableOpacity
+                                    style={styles.clearButton}
+                                    onPress={() => setSearchText("")}
+                                >
+                                    <MaterialIcons
+                                        name="close"
+                                        size={20}
+                                        color="#e6007e"
+                                    />
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
+
+                        <Text style={styles.modalSubtitle}>Categoría</Text>
+
+                        <View
+                            style={[
+                                styles.selectContainer,
+                                { backgroundColor: isDark ? "#2C2C36" : "#f5f5f5" },
+                            ]}
+                        >
+                            <Picker
+                                selectedValue={selectedCategory}
+                                onValueChange={(itemValue) =>
+                                    setSelectedCategory(itemValue)
+                                }
+                                style={{ color: "#e6007e" }}
+                                dropdownIconColor="#e6007e"
+                            >
+                                <Picker.Item label="Todas las categorías" value="" />
+                                {categorias.map((cat) => (
+                                    <Picker.Item key={cat} label={cat} value={cat} />
+                                ))}
+                            </Picker>
+                        </View>
+
+                        <Text style={styles.modalSubtitle}>Resultados</Text>
+
+                        <ScrollView
+                            style={{ maxHeight: 260 }}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {resultadosFiltrados.length === 0 ? (
+                                <Text style={styles.noResults}>
+                                    No se encontraron resultados
+                                </Text>
+                            ) : (
+                                resultadosFiltrados.map((lugar) => (
+                                    <TouchableOpacity
+                                        key={lugar.id}
+                                        style={[
+                                            styles.resultCard,
+                                            {
+                                                backgroundColor: isDark
+                                                    ? "#2C2C36"
+                                                    : "#f5f5f5",
+                                            },
+                                        ]}
+                                        onPress={() => centerToPlace(lugar)}
+                                    >
+                                        <Text style={styles.resultTitle}>
+                                            {lugar.nombre}
+                                        </Text>
+                                        <Text style={styles.resultCategory}>
+                                            {lugar.categoria}
+                                        </Text>
+                                        <Text style={styles.resultDesc}>
+                                            {lugar.descripcion}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))
+                            )}
+                        </ScrollView>
+                    </Pressable>
+                </Pressable>
+            </Modal>
+
+            {/* MODAL EVENTOS CERCANOS */}
+            <Modal
+                visible={eventModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setEventModalVisible(false)}
+            >
+                <Pressable
+                    style={styles.modalOverlay}
+                    onPress={() => setEventModalVisible(false)}
+                >
+                    <Pressable
+                        style={[
+                            styles.modalContent,
+                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
+                        ]}
+                    >
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Eventos cercanos</Text>
+
+                            <TouchableOpacity
+                                onPress={() => setEventModalVisible(false)}
+                            >
+                                <MaterialIcons name="close" size={26} color="#e6007e" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <ScrollView
+                            style={{ maxHeight: 330 }}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {eventosOrdenados.map((evento) => (
+                                <TouchableOpacity
+                                    key={evento.id}
+                                    style={[
+                                        styles.resultCard,
+                                        {
+                                            backgroundColor: isDark
+                                                ? "#2C2C36"
+                                                : "#f5f5f5",
+                                        },
+                                    ]}
+                                    onPress={() => centerToEvent(evento)}
+                                >
+                                    <Text style={styles.resultTitle}>
+                                        {evento.nombre}
+                                    </Text>
+
+                                    <Text style={styles.resultCategory}>
+                                        {evento.fecha}
+                                    </Text>
+
+                                    <Text style={styles.resultDesc}>
+                                        {evento.descripcion}
+                                    </Text>
+
+                                    <Text style={styles.distanceText}>
+                                        Aprox. {evento.distancia.toFixed(2)} km
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </Pressable>
+                </Pressable>
+            </Modal>
+
+            {/* MENÚ */}
             {menuVisible && (
                 <Pressable style={styles.overlay} onPress={closeMenu}>
                     <Animated.View
                         style={[
                             styles.drawer,
                             {
-                                backgroundColor: isDark ? "#0a0a0a" : "#fff",
+                                backgroundColor: isDark ? "#3A3A46" : "#fff",
                                 transform: [{ translateX: slideAnim }],
                             },
                         ]}
@@ -337,5 +730,96 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontWeight: "bold",
         fontSize: 14,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.45)",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+    },
+    modalContent: {
+        width: "100%",
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: "#e6007e",
+        padding: 18,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 10,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#e6007e",
+    },
+    modalSubtitle: {
+        marginTop: 15,
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#e6007e",
+        marginBottom: 8,
+    },
+    inputWrapper: {
+        position: "relative",
+    },
+    searchInput: {
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+        fontSize: 15,
+        borderWidth: 1,
+        borderColor: "#e6007e",
+        paddingRight: 40,
+    },
+    clearButton: {
+        position: "absolute",
+        right: 10,
+        top: 12,
+    },
+    selectContainer: {
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#e6007e",
+        overflow: "hidden",
+    },
+    resultCard: {
+        borderRadius: 12,
+        padding: 14,
+        borderWidth: 1,
+        borderColor: "rgba(230,0,126,0.5)",
+        marginBottom: 10,
+    },
+    resultTitle: {
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "#e6007e",
+    },
+    resultCategory: {
+        fontSize: 12,
+        fontWeight: "bold",
+        color: "rgba(230,0,126,0.8)",
+        marginTop: 3,
+    },
+    resultDesc: {
+        fontSize: 13,
+        color: "#e6007e",
+        marginTop: 6,
+    },
+    noResults: {
+        textAlign: "center",
+        marginTop: 20,
+        color: "#e6007e",
+        fontWeight: "bold",
+    },
+    distanceText: {
+        marginTop: 10,
+        fontSize: 12,
+        fontWeight: "bold",
+        color: "#e6007e",
+        textAlign: "right",
     },
 });

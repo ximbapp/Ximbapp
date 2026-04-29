@@ -76,7 +76,7 @@ const Login = ({ navigation }) => {
         <ScrollView
             contentContainerStyle={[
                 styles.container,
-                { backgroundColor: isDark ? "#000" : "#fff" },
+                { backgroundColor: isDark ? "#3A3A46" : "#fff" },
             ]}
             keyboardShouldPersistTaps="always"
         >
@@ -87,11 +87,16 @@ const Login = ({ navigation }) => {
 
             <Text style={styles.title}>Tu lugar perfecto a un click de distancia</Text>
 
-            <View style={styles.form}>
+            <View
+                style={[
+                    styles.form,
+                    { backgroundColor: isDark ? "#3A3A46" : "#fff" },
+                ]}
+            >
                 <Text
                     style={[
                         styles.formTitle,
-                        { backgroundColor: isDark ? "#000" : "#fff" },
+                        { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                     ]}
                 >
                     Iniciar Sesión
