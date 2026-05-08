@@ -32,11 +32,10 @@ const Registro = ({ navigation }) => {
     const [correo, setCorreo] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-
     const [fechaNacimiento, setFechaNacimiento] = useState(null);
     const [showPicker, setShowPicker] = useState(false);
-
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const validarSoloLetras = (texto) => {
         const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
@@ -78,16 +77,14 @@ const Registro = ({ navigation }) => {
 
     const handleFechaChange = (event, selectedDate) => {
         setShowPicker(false);
-
         if (event.type === "dismissed") return;
-
         if (selectedDate) {
             setFechaNacimiento(selectedDate);
             clearError("fechaNacimiento");
         }
     };
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         let newErrors = {};
 
         if (nombre.trim() === "") newErrors.nombre = "El nombre es obligatorio";
@@ -145,11 +142,50 @@ const Registro = ({ navigation }) => {
             newErrors.confirmPassword = "Las contraseñas no coinciden";
 
         setErrors(newErrors);
-
         if (Object.keys(newErrors).length > 0) return;
 
-        alert("Cuenta creada correctamente (simulado)");
-        navigation.goBack();
+        try {
+            setLoading(true);
+
+            const response = await fetch('http://157.230.63.10:3000/api/auth/registro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre: nombre.trim(),
+                    apellidoP: apellido_pa.trim(),
+                    apellidoM: apellido_ma.trim(),
+                    fechaNacimiento: fechaNacimiento.toISOString(),
+                    nacionalidad: nacionalidad.trim(),
+                    codigoPostal: codigo_postal.trim(),
+                    alcaldiaMunicipio: localidad.trim(),
+                    genero: genero,
+                    telefono: telefono.trim(),
+                    email: correo.trim(),
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Cuenta creada correctamente");
+                navigation.goBack();
+            } else {
+                if (data.mensaje.includes("email")) {
+                    setErrors({ correo: "Este correo ya está registrado" });
+                } else if (data.mensaje.includes("telefono")) {
+                    setErrors({ telefono: "Este teléfono ya está registrado" });
+                } else {
+                    alert(data.mensaje);
+                }
+            }
+        } catch (error) {
+            alert("Error de conexión con el servidor");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -183,10 +219,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Nombre"
                     value={nombre}
-                    onChangeText={(text) => {
-                        setNombre(text);
-                        clearError("nombre");
-                    }}
+                    onChangeText={(text) => { setNombre(text); clearError("nombre"); }}
                     isDark={isDark}
                     error={errors.nombre}
                 />
@@ -194,10 +227,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Apellido Paterno"
                     value={apellido_pa}
-                    onChangeText={(text) => {
-                        setApellido_pa(text);
-                        clearError("apellido_pa");
-                    }}
+                    onChangeText={(text) => { setApellido_pa(text); clearError("apellido_pa"); }}
                     isDark={isDark}
                     error={errors.apellido_pa}
                 />
@@ -205,10 +235,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Apellido Materno (opcional)"
                     value={apellido_ma}
-                    onChangeText={(text) => {
-                        setApellido_ma(text);
-                        clearError("apellido_ma");
-                    }}
+                    onChangeText={(text) => { setApellido_ma(text); clearError("apellido_ma"); }}
                     isDark={isDark}
                     error={errors.apellido_ma}
                 />
@@ -238,10 +265,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Código Postal"
                     value={codigo_postal}
-                    onChangeText={(text) => {
-                        setCodigo_postal(text.replace(/[^0-9]/g, ""));
-                        clearError("codigo_postal");
-                    }}
+                    onChangeText={(text) => { setCodigo_postal(text.replace(/[^0-9]/g, "")); clearError("codigo_postal"); }}
                     isDark={isDark}
                     error={errors.codigo_postal}
                     keyboardType="numeric"
@@ -251,10 +275,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Nacionalidad"
                     value={nacionalidad}
-                    onChangeText={(text) => {
-                        setNacionalidad(text);
-                        clearError("nacionalidad");
-                    }}
+                    onChangeText={(text) => { setNacionalidad(text); clearError("nacionalidad"); }}
                     isDark={isDark}
                     error={errors.nacionalidad}
                 />
@@ -262,10 +283,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Localidad"
                     value={localidad}
-                    onChangeText={(text) => {
-                        setLocalidad(text);
-                        clearError("localidad");
-                    }}
+                    onChangeText={(text) => { setLocalidad(text); clearError("localidad"); }}
                     isDark={isDark}
                     error={errors.localidad}
                 />
@@ -280,10 +298,7 @@ const Registro = ({ navigation }) => {
                 >
                     <Picker
                         selectedValue={genero}
-                        onValueChange={(itemValue) => {
-                            setGenero(itemValue);
-                            clearError("genero");
-                        }}
+                        onValueChange={(itemValue) => { setGenero(itemValue); clearError("genero"); }}
                         style={{ color: "#e6007e" }}
                         dropdownIconColor="#e6007e"
                     >
@@ -301,10 +316,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Teléfono"
                     value={telefono}
-                    onChangeText={(text) => {
-                        setTelefono(text.replace(/[^0-9]/g, ""));
-                        clearError("telefono");
-                    }}
+                    onChangeText={(text) => { setTelefono(text.replace(/[^0-9]/g, "")); clearError("telefono"); }}
                     isDark={isDark}
                     error={errors.telefono}
                     keyboardType="numeric"
@@ -314,10 +326,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Usuario"
                     value={usuario}
-                    onChangeText={(text) => {
-                        setUsuario(text);
-                        clearError("usuario");
-                    }}
+                    onChangeText={(text) => { setUsuario(text); clearError("usuario"); }}
                     isDark={isDark}
                     error={errors.usuario}
                 />
@@ -325,10 +334,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Correo"
                     value={correo}
-                    onChangeText={(text) => {
-                        setCorreo(text);
-                        clearError("correo");
-                    }}
+                    onChangeText={(text) => { setCorreo(text); clearError("correo"); }}
                     isDark={isDark}
                     error={errors.correo}
                     keyboardType="email-address"
@@ -337,10 +343,7 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Contraseña"
                     value={password}
-                    onChangeText={(text) => {
-                        setPassword(text);
-                        clearError("password");
-                    }}
+                    onChangeText={(text) => { setPassword(text); clearError("password"); }}
                     secureTextEntry
                     isDark={isDark}
                     error={errors.password}
@@ -349,17 +352,20 @@ const Registro = ({ navigation }) => {
                 <FloatingInput
                     label="Confirmar contraseña"
                     value={confirmPassword}
-                    onChangeText={(text) => {
-                        setConfirmPassword(text);
-                        clearError("confirmPassword");
-                    }}
+                    onChangeText={(text) => { setConfirmPassword(text); clearError("confirmPassword"); }}
                     secureTextEntry
                     isDark={isDark}
                     error={errors.confirmPassword}
                 />
 
-                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                    <Text style={styles.buttonText}>Crear Cuenta</Text>
+                <TouchableOpacity
+                    style={[styles.button, loading && { opacity: 0.7 }]}
+                    onPress={handleRegister}
+                    disabled={loading}
+                >
+                    <Text style={styles.buttonText}>
+                        {loading ? "Creando cuenta..." : "Crear Cuenta"}
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -373,17 +379,10 @@ const Registro = ({ navigation }) => {
                 </View>
 
                 <View style={styles.socialContainer}>
-                    <TouchableOpacity
-                        style={styles.socialButton}
-                        onPress={handleGoogleLogin}
-                    >
+                    <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
                         <Ionicons name="logo-google" size={35} color="#DB4437" />
                     </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.socialButton}
-                        onPress={handleFacebookLogin}
-                    >
+                    <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin}>
                         <Ionicons name="logo-facebook" size={40} color="#4267B2" />
                     </TouchableOpacity>
                 </View>

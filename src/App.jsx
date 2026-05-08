@@ -20,9 +20,9 @@ const MainApp = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Registro" component={Registro} />
+                <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="Perfil" component={Perfil} />
                 <Stack.Screen name="Ajustes" component={Ajustes} />
             </Stack.Navigator>

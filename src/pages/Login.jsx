@@ -12,6 +12,7 @@ import {
     Keyboard,
 } from "react-native";
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,8 +22,8 @@ const Login = ({ navigation }) => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const validarEmail = (correo) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,7 +34,7 @@ const Login = ({ navigation }) => {
         setErrors((prev) => ({ ...prev, [campo]: "" }));
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         let newErrors = {};
 
         if (email.trim() === "") {
@@ -47,21 +48,41 @@ const Login = ({ navigation }) => {
         }
 
         setErrors(newErrors);
-
         if (Object.keys(newErrors).length > 0) return;
 
-        const usuarioCorrecto = "miguel@gmail.com";
-        const passwordCorrecto = "Miguel123!";
+        try {
+            setLoading(true);
 
-        if (email.trim() !== usuarioCorrecto || password !== passwordCorrecto) {
-            setErrors({
-                email: "Correo o contraseña incorrectos",
-                password: "Correo o contraseña incorrectos",
+            const response = await fetch('http://157.230.63.10:3000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email.trim(),
+                    password: password
+                })
             });
-            return;
-        }
 
-        navigation.replace("Home");
+            const data = await response.json();
+
+            if (response.ok) {
+                await AsyncStorage.setItem('token', data.token);
+                await AsyncStorage.setItem('usuario', JSON.stringify(data.usuario));
+                navigation.replace("Home");
+            } else {
+                setErrors({
+                    email: data.mensaje,
+                    password: data.mensaje,
+                });
+            }
+        } catch (error) {
+            setErrors({
+                email: "Error de conexión con el servidor",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogleLogin = () => {
@@ -126,8 +147,14 @@ const Login = ({ navigation }) => {
                     error={errors.password}
                 />
 
-                <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Entrar</Text>
+                <TouchableOpacity
+                    style={[styles.button, loading && { opacity: 0.7 }]}
+                    onPress={handleLogin}
+                    disabled={loading}
+                >
+                    <Text style={styles.buttonText}>
+                        {loading ? "Entrando..." : "Entrar"}
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity>
