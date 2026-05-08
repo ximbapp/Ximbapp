@@ -7,6 +7,8 @@ import Registro from "./pages/Registro";
 import Home from "./pages/Home";
 import Perfil from "./pages/Perfil";
 import Ajustes from "./pages/Ajustes";
+import DetalleLugar from "./pages/DetalleLugar";
+
 
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
 
@@ -25,6 +27,7 @@ const MainApp = () => {
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="Perfil" component={Perfil} />
                 <Stack.Screen name="Ajustes" component={Ajustes} />
+                <Stack.Screen name="DetalleLugar" component={DetalleLugar} />
             </Stack.Navigator>
         </NavigationContainer>
     );
