@@ -26,7 +26,7 @@ const Perfil = ({ navigation }) => {
         try {
             const token = await AsyncStorage.getItem('token');
             
-            const response = await fetch('http://157.230.63.10:3000/api/auth/perfil', {
+            const response = await fetch('http://ximbapp.com:3000/api/auth/perfil', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

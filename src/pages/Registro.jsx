@@ -153,7 +153,7 @@ const Registro = ({ navigation }) => {
         try {
             setLoading(true);
 
-            const response = await fetch('http://157.230.63.10:3000/api/auth/registro', {
+            const response = await fetch('http://ximbapp.com:3000/api/auth/registro', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

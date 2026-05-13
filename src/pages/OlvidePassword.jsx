@@ -8,7 +8,7 @@ import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const API_URL = "http://157.230.63.10:3000/api";
+const API_URL = "http://ximbapp.com:3000/api";
 
 const OlvidePassword = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);

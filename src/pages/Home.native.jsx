@@ -24,7 +24,7 @@ import { Fontisto, Entypo, MaterialIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../context/ThemeContext";
 import { Picker } from "@react-native-picker/picker";
 
-const API_URL = "http://157.230.63.10:3000/api";
+const API_URL = "http://ximbapp.com:3000/api";
 
 const Home = ({ navigation }) => {
     const { themeMode, setThemeMode, isDark } = useContext(ThemeContext);
