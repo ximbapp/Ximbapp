@@ -10,12 +10,15 @@ import {
     ScrollView,
     TouchableWithoutFeedback,
     Keyboard,
+    Linking,
 } from "react-native";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FloatingInput from "../components/FloatingInput";
-import { ThemeContext } from "../context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemeContext } from "../context/ThemeContext";
+
+const DOWNLOAD_URL = "https://expo.dev";
 
 const Login = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);
@@ -55,9 +58,7 @@ const Login = ({ navigation }) => {
 
             const response = await fetch('http://157.230.63.10:3000/api/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email: email.trim(),
                     password: password
@@ -77,20 +78,10 @@ const Login = ({ navigation }) => {
                 });
             }
         } catch (error) {
-            setErrors({
-                email: "Error de conexión con el servidor",
-            });
+            setErrors({ email: "Error de conexión con el servidor" });
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleGoogleLogin = () => {
-        alert("Login con Google (pendiente)");
-    };
-
-    const handleFacebookLogin = () => {
-        alert("Login con Facebook (pendiente)");
     };
 
     const content = (
@@ -108,18 +99,8 @@ const Login = ({ navigation }) => {
 
             <Text style={styles.title}>Tu lugar perfecto a un click de distancia</Text>
 
-            <View
-                style={[
-                    styles.form,
-                    { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                ]}
-            >
-                <Text
-                    style={[
-                        styles.formTitle,
-                        { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                    ]}
-                >
+            <View style={[styles.form, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
+                <Text style={[styles.formTitle, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
                     Iniciar Sesión
                 </Text>
 
@@ -157,36 +138,25 @@ const Login = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                {/* ← Aquí está el cambio, ahora navega a OlvidePassword */}
+                <TouchableOpacity onPress={() => navigation.navigate("OlvidePassword")}>
                     <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
                     <Text style={styles.link}>Crear cuenta</Text>
                 </TouchableOpacity>
-
-                <View style={styles.dividerContainer}>
-                    <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>o</Text>
-                    <View style={styles.dividerLine} />
-                </View>
-
-                <View style={styles.socialContainer}>
-                    <TouchableOpacity
-                        style={styles.socialButton}
-                        onPress={handleGoogleLogin}
-                    >
-                        <Ionicons name="logo-google" size={35} color="#DB4437" />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.socialButton}
-                        onPress={handleFacebookLogin}
-                    >
-                        <Ionicons name="logo-facebook" size={40} color="#4267B2" />
-                    </TouchableOpacity>
-                </View>
             </View>
+
+            {Platform.OS === "web" && (
+                <TouchableOpacity
+                    style={styles.downloadButton}
+                    onPress={() => Linking.openURL(DOWNLOAD_URL)}
+                >
+                    <Ionicons name="download-outline" size={22} color="#fff" />
+                    <Text style={styles.downloadButtonText}>Descargar la app</Text>
+                </TouchableOpacity>
+            )}
         </ScrollView>
     );
 
@@ -294,5 +264,24 @@ const styles = StyleSheet.create({
         borderColor: "#e6007e",
         justifyContent: "center",
         alignItems: "center",
+    },
+    downloadButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        backgroundColor: "#e6007e",
+        paddingVertical: 14,
+        paddingHorizontal: 30,
+        borderRadius: 12,
+        marginBottom: 20,
+        alignSelf: "center",
+        elevation: 3,
+        marginTop: 15,
+    },
+    downloadButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
