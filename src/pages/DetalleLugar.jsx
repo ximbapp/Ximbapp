@@ -21,7 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { ThemeContext } from "../context/ThemeContext";
 
-const API_URL = "http://ximbapp.com:3000/api";
+const API_URL = "https://ximbapp.com/api";
 const { width } = Dimensions.get("window");
 
 const DetalleLugar = ({ route, navigation }) => {

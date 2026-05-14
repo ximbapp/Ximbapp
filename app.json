@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ximbapp",
     "slug": "Ximbapp",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/Ximbapp.png",
     "userInterfaceStyle": "light",
@@ -13,13 +13,14 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": {
+    "android": { 
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/Ximbapp.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#E6F4FE"
       },
       "package": "com.ximbapp.Ximbapp"
     },
+
     "web": {
       "favicon": "./assets/images/Ximbapp.png"
     },

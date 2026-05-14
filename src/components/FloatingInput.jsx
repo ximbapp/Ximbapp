@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, TextInput, StyleSheet, Animated, Text } from "react-native";
+import { View, TextInput, StyleSheet, Animated, Text, Platform } from "react-native";
 
 const FloatingInput = ({
     label,
@@ -40,7 +40,6 @@ const FloatingInput = ({
     };
 
     const labelBg = isDark ? "#3A3A46" : "#fff";
-
     const labelStyle = {
         position: "absolute",
         left: 0,
@@ -60,14 +59,14 @@ const FloatingInput = ({
 
     return (
         <View style={styles.inputContainer}>
-            <Animated.Text style={labelStyle}>{label}</Animated.Text>
-
+            <Animated.Text style={labelStyle} pointerEvents="none">{label}</Animated.Text>
             <TextInput
                 style={[
                     styles.input,
                     {
                         color: "#e6007e",
                         borderBottomColor: error ? "#ff3b30" : "#e6007e",
+                        ...(Platform.OS === "web" && { outlineStyle: "none" }),
                     },
                 ]}
                 value={value}
@@ -80,7 +79,6 @@ const FloatingInput = ({
                 keyboardType={keyboardType}
                 maxLength={maxLength}
             />
-
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
     );

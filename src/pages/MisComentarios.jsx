@@ -7,7 +7,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeContext } from "../context/ThemeContext";
 
-const API_URL = "http://ximbapp.com:3000/api";
+const API_URL = "https://ximbapp.com/api";
 
 const MisComentarios = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);

@@ -1,6 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ActivityIndicator, View } from "react-native";
 import Login from "./pages/Login";
 import Registro from "./pages/Registro";
 import Home from "./pages/Home";
@@ -18,10 +20,37 @@ const Stack = createNativeStackNavigator();
 
 const MainApp = () => {
     const { loadingTheme } = useContext(ThemeContext);
-    if (loadingTheme) return null;
+    const [verificando, setVerificando] = useState(true);
+    const [initialRoute, setInitialRoute] = useState("Login");
+
+    useEffect(() => {
+        const verificarSesion = async () => {
+            try {
+                const token = await AsyncStorage.getItem("token");
+                setInitialRoute(token ? "Home" : "Login");
+            } catch (error) {
+                setInitialRoute("Login");
+            } finally {
+                setVerificando(false);
+            }
+        };
+        verificarSesion();
+    }, []);
+
+    if (loadingTheme || verificando) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#3A3A46" }}>
+                <ActivityIndicator size="large" color="#e6007e" />
+            </View>
+        );
+    }
+
     return (
         <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Navigator
+                initialRouteName={initialRoute}
+                screenOptions={{ headerShown: false }}
+            >
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Registro" component={Registro} />
                 <Stack.Screen name="Home" component={Home} />

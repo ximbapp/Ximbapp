@@ -8,7 +8,7 @@ import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const API_URL = "http://ximbapp.com:3000/api";
+const API_URL = "https://ximbapp.com/api";
 
 const OlvidePassword = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);
@@ -54,7 +54,7 @@ const OlvidePassword = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={{ flex: 1, backgroundColor: isDark ? "#3A3A46" : "#fff" }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -136,6 +136,9 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: "center",
         padding: 30,
+        maxWidth: 480,
+        width: "100%",
+        alignSelf: "center",
     },
     backBtn: {
         position: "absolute",

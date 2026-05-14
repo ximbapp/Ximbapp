@@ -56,7 +56,7 @@ const Login = ({ navigation }) => {
         try {
             setLoading(true);
 
-            const response = await fetch('http://ximbapp.com:3000/api/auth/login', {
+            const response = await fetch('https://ximbapp.com/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -162,7 +162,7 @@ const Login = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={{ flex: 1, backgroundColor: isDark ? "#3A3A46" : "#fff" }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             {Platform.OS === "web" ? (
@@ -183,6 +183,9 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: "center",
         padding: 25,
+        maxWidth: 480,
+        width: "100%",
+        alignSelf: "center",
     },
     title: {
         fontSize: 22,
