@@ -23,12 +23,14 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Fontisto, Entypo, MaterialIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../context/ThemeContext";
 import { Picker } from "@react-native-picker/picker";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const API_URL = "https://ximbapp.com/api";
 
 const Home = ({ navigation }) => {
     const { themeMode, setThemeMode, isDark } = useContext(ThemeContext);
     const mapRef = useRef(null);
+    const insets = useSafeAreaInsets();
 
     const [location, setLocation] = useState(null);
     const [locationReady, setLocationReady] = useState(false);
@@ -485,7 +487,7 @@ const Home = ({ navigation }) => {
                 <MaterialIcons name="my-location" size={24} color="#fff" />
             </TouchableOpacity>
 
-            <View style={[styles.bottomBar, { backgroundColor: isDark ? "#3A3A46" : "#ffffff" }]}>
+            <View style={[styles.bottomBar, { backgroundColor: isDark ? "#3A3A46" : "#ffffff", paddingBottom: insets.bottom }]}>
                 <TouchableOpacity style={styles.sideButton} onPress={() => setEventModalVisible(true)}>
                     <Entypo name="calendar" size={26} color="#e6007e" />
                 </TouchableOpacity>

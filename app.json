@@ -13,14 +13,19 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": { 
+    "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#E6F4FE"
       },
-      "package": "com.ximbapp.Ximbapp"
+      "package": "com.ximbapp.Ximbapp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAsvCrLakJyFVgV3FpATCqbvof9eZ7CYUA"
+        }
+      },
+      "usesCleartextTraffic": true
     },
-
     "web": {
       "favicon": "./assets/images/Ximbapp.png"
     },

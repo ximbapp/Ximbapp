@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Login from "./pages/Login";
 import Registro from "./pages/Registro";
 import Home from "./pages/Home";
@@ -69,9 +70,11 @@ const MainApp = () => {
 
 const App = () => {
     return (
-        <ThemeProvider>
-            <MainApp />
-        </ThemeProvider>
+        <SafeAreaProvider>
+            <ThemeProvider>
+                <MainApp />
+            </ThemeProvider>
+        </SafeAreaProvider>
     );
 };
 
