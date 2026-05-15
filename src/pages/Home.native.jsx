@@ -14,7 +14,7 @@ import {
     Platform,
 } from "react-native";
 
-import MapView, { UrlTile, Marker } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -26,6 +26,55 @@ import { Picker } from "@react-native-picker/picker";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const API_URL = "https://ximbapp.com/api";
+
+const iconosPorCategoria = {
+    "Historia/Cultura": { nombre: "account-balance", color: "#8B4513" },
+    "Religioso": { nombre: "church", color: "#6A0DAD" },
+    "Centros Recreativos": { nombre: "park", color: "#2E8B57" },
+    "Gastronomía": { nombre: "restaurant", color: "#FF6347" },
+    "Aventura": { nombre: "terrain", color: "#228B22" },
+    "Eventos": { nombre: "event", color: "#FF8C00" },
+};
+
+const MarkerPersonalizado = ({ categoria }) => {
+    const icono = iconosPorCategoria[categoria] || { nombre: "place", color: "#e6007e" };
+    return (
+        <View style={{
+            alignItems: "center",
+            justifyContent: "center",
+        }}>
+            <View style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: "white",
+                borderWidth: 3,
+                borderColor: icono.color,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.5,
+                shadowRadius: 4,
+                elevation: 8,
+                overflow: "hidden",
+            }}>
+                <MaterialIcons name={icono.nombre} size={24} color={icono.color} />
+            </View>
+            <View style={{
+                width: 0,
+                height: 0,
+                borderLeftWidth: 6,
+                borderRightWidth: 6,
+                borderTopWidth: 10,
+                borderLeftColor: "transparent",
+                borderRightColor: "transparent",
+                borderTopColor: icono.color,
+                marginTop: -1,
+            }} />
+        </View>
+    );
+};
 
 const Home = ({ navigation }) => {
     const { themeMode, setThemeMode, isDark } = useContext(ThemeContext);
@@ -53,10 +102,8 @@ const Home = ({ navigation }) => {
     const [eventos, setEventos] = useState([]);
     const [loadingLugares, setLoadingLugares] = useState(true);
 
-    // Filtro de categorías en mapa
     const [filtroMapa, setFiltroMapa] = useState("");
 
-    // Formulario lugar
     const [lugarNombre, setLugarNombre] = useState("");
     const [lugarLocalidad, setLugarLocalidad] = useState("");
     const [lugarCategoria, setLugarCategoria] = useState("");
@@ -69,7 +116,6 @@ const Home = ({ navigation }) => {
     const [lugarFotos, setLugarFotos] = useState([]);
     const [savingLugar, setSavingLugar] = useState(false);
 
-    // Formulario evento
     const [eventoNombre, setEventoNombre] = useState("");
     const [eventoFechaInicio, setEventoFechaInicio] = useState(new Date());
     const [eventoFechaFinal, setEventoFechaFinal] = useState(new Date());
@@ -156,7 +202,6 @@ const Home = ({ navigation }) => {
                 setLocationReady(true);
                 return;
             }
-            // Obtener ubicación inicial inmediatamente
             const current = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.High,
             });
@@ -166,7 +211,6 @@ const Home = ({ navigation }) => {
             };
             setLocation(coords);
             setLocationReady(true);
-            // Centrar el mapa en la ubicación real
             setTimeout(() => {
                 if (mapRef.current) {
                     mapRef.current.animateToRegion({
@@ -176,7 +220,6 @@ const Home = ({ navigation }) => {
                     }, 600);
                 }
             }, 500);
-            // Seguir actualizando
             subscription = await Location.watchPositionAsync(
                 { accuracy: Location.Accuracy.High, timeInterval: 2000, distanceInterval: 2 },
                 (loc) => {
@@ -417,12 +460,27 @@ const Home = ({ navigation }) => {
             <MapView
                 ref={mapRef}
                 style={styles.map}
-                mapType="none"
+                mapType={isDark ? "mutedStandard" : "standard"}
                 showsUserLocation={true}
                 showsMyLocationButton={false}
                 onLongPress={handleLongPress}
                 showsPointsOfInterest={false}
                 legalLabelInsets={{ bottom: -100, right: -100 }}
+                customMapStyle={isDark ? [
+                    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }] },
+                    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
+                    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }] },
+                    { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] },
+                    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }] },
+                    { featureType: "poi", stylers: [{ visibility: "off" }] },
+                    { featureType: "transit", stylers: [{ visibility: "off" }] }
+                ] : [
+                    { featureType: "poi", stylers: [{ visibility: "off" }] },
+                    { featureType: "transit", stylers: [{ visibility: "off" }] }
+                ]}
                 initialRegion={{
                     latitude: location.latitude,
                     longitude: location.longitude,
@@ -430,23 +488,17 @@ const Home = ({ navigation }) => {
                     longitudeDelta: 0.01,
                 }}
             >
-                <UrlTile
-                    urlTemplate={
-                        isDark
-                            ? "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
-                            : "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-                    }
-                    maximumZ={19}
-                />
                 {lugaresFiltrados.map((lugar) => (
                     <Marker
                         key={lugar._id}
                         coordinate={{ latitude: lugar.coordenadas.latitud, longitude: lugar.coordenadas.longitud }}
                         title={lugar.nombre}
                         description={lugar.descripcion}
-                        pinColor="#e6007e"
                         onPress={() => navigation.navigate("DetalleLugar", { lugar })}
-                    />
+                        tracksViewChanges={false}
+                    >
+                        <MarkerPersonalizado categoria={lugar.categoria} />
+                    </Marker>
                 ))}
                 {selectedPlace && (
                     <Marker
@@ -538,18 +590,13 @@ const Home = ({ navigation }) => {
                                     {categorias.map((cat) => (<Picker.Item key={cat} label={cat} value={cat} />))}
                                 </Picker>
                             </View>
-
                             <Text style={styles.modalSubtitle}>Horario</Text>
-                            <TouchableOpacity
-                                style={[styles.checkRow]}
-                                onPress={() => setLugarSiempreAbierto(!lugarSiempreAbierto)}
-                            >
+                            <TouchableOpacity style={[styles.checkRow]} onPress={() => setLugarSiempreAbierto(!lugarSiempreAbierto)}>
                                 <View style={[styles.checkbox, lugarSiempreAbierto && styles.checkboxActivo]}>
                                     {lugarSiempreAbierto && <MaterialIcons name="check" size={14} color="#fff" />}
                                 </View>
                                 <Text style={styles.checkLabel}>Siempre abierto / Sin horario</Text>
                             </TouchableOpacity>
-
                             {!lugarSiempreAbierto && (
                                 <>
                                     <Text style={styles.modalSubtitle}>Hora de apertura</Text>
@@ -570,7 +617,6 @@ const Home = ({ navigation }) => {
                                     )}
                                 </>
                             )}
-
                             <TextInput style={[styles.input, styles.inputMultiline, { backgroundColor: isDark ? "#2C2C36" : "#f5f5f5", color: "#e6007e" }]} placeholder="Descripción" placeholderTextColor="rgba(230,0,126,0.6)" value={lugarDescripcion} onChangeText={setLugarDescripcion} multiline numberOfLines={3} />
                             <TouchableOpacity style={[styles.fotoButton, { borderColor: "#e6007e" }]} onPress={seleccionarFotos}>
                                 <MaterialIcons name="add-a-photo" size={22} color="#e6007e" />
@@ -803,17 +849,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#e6007e",
     },
-    filtroChipActivo: {
-        backgroundColor: "#e6007e",
-    },
-    filtroChipText: {
-        fontSize: 12,
-        fontWeight: "bold",
-        color: "#e6007e",
-    },
-    filtroChipTextActivo: {
-        color: "#fff",
-    },
+    filtroChipActivo: { backgroundColor: "#e6007e" },
+    filtroChipText: { fontSize: 12, fontWeight: "bold", color: "#e6007e" },
+    filtroChipTextActivo: { color: "#fff" },
     locationButton: {
         position: "absolute",
         right: 20,
