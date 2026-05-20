@@ -12,6 +12,7 @@ import {
     ActivityIndicator,
     Image,
     Platform,
+    Alert,
 } from "react-native";
 
 import MapView, { Marker } from "react-native-maps";
@@ -28,51 +29,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const API_URL = "https://ximbapp.com/api";
 
 const iconosPorCategoria = {
-    "Historia/Cultura": { nombre: "account-balance", color: "#8B4513" },
-    "Religioso": { nombre: "church", color: "#6A0DAD" },
-    "Centros Recreativos": { nombre: "park", color: "#2E8B57" },
-    "Gastronomía": { nombre: "restaurant", color: "#FF6347" },
-    "Aventura": { nombre: "terrain", color: "#228B22" },
-    "Eventos": { nombre: "event", color: "#FF8C00" },
+    "Historia/Cultura": "#8B4513",
+    "Religioso": "#6A0DAD",
+    "Centros Recreativos": "#2E8B57",
+    "Gastronomía": "#FF6347",
+    "Aventura": "#228B22",
+    "Eventos": "#FF8C00",
 };
 
-const MarkerPersonalizado = ({ categoria }) => {
-    const icono = iconosPorCategoria[categoria] || { nombre: "place", color: "#e6007e" };
+const MarkerPersonalizado = ({ categoria, coordinate, titulo, descripcion, onPress }) => {
+    const color = iconosPorCategoria[categoria] || "#e6007e";
     return (
-        <View style={{
-            alignItems: "center",
-            justifyContent: "center",
-        }}>
-            <View style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: "white",
-                borderWidth: 3,
-                borderColor: icono.color,
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.5,
-                shadowRadius: 4,
-                elevation: 8,
-                overflow: "hidden",
-            }}>
-                <MaterialIcons name={icono.nombre} size={24} color={icono.color} />
-            </View>
-            <View style={{
-                width: 0,
-                height: 0,
-                borderLeftWidth: 6,
-                borderRightWidth: 6,
-                borderTopWidth: 10,
-                borderLeftColor: "transparent",
-                borderRightColor: "transparent",
-                borderTopColor: icono.color,
-                marginTop: -1,
-            }} />
-        </View>
+        <Marker
+            coordinate={coordinate}
+            title={titulo}
+            description={descripcion}
+            onPress={onPress}
+            pinColor={color}
+        />
     );
 };
 
@@ -83,6 +57,7 @@ const Home = ({ navigation }) => {
 
     const [location, setLocation] = useState(null);
     const [locationReady, setLocationReady] = useState(false);
+    const [miUsuarioId, setMiUsuarioId] = useState(null);
 
     const [menuVisible, setMenuVisible] = useState(false);
     const slideAnim = useRef(new Animated.Value(300)).current;
@@ -174,8 +149,21 @@ const Home = ({ navigation }) => {
         }
     };
 
+    const cargarMiId = async () => {
+        try {
+            const token = await AsyncStorage.getItem("token");
+            if (!token) return;
+            const response = await fetch(`${API_URL}/auth/perfil`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) setMiUsuarioId(data.usuario._id);
+        } catch (e) {}
+    };
+
     useEffect(() => {
         cargarDatos();
+        cargarMiId();
     }, []);
 
     const calcularDistanciaKm = (lat1, lon1, lat2, lon2) => {
@@ -279,6 +267,7 @@ const Home = ({ navigation }) => {
             );
         }
         setSearchModalVisible(false);
+        navigation.navigate("DetalleLugar", { lugar: place, miUsuarioId });
     };
 
     const centerToEvent = (event) => {
@@ -298,7 +287,7 @@ const Home = ({ navigation }) => {
             }
         }
         setEventModalVisible(false);
-        navigation.navigate("DetalleEvento", { evento: event });
+        navigation.navigate("DetalleEvento", { evento: event, miUsuarioId });
     };
 
     const seleccionarFotos = async () => {
@@ -381,18 +370,24 @@ const Home = ({ navigation }) => {
         try {
             setSavingEvento(true);
             const token = await AsyncStorage.getItem("token");
+            const formData = new FormData();
+            formData.append("nombre", eventoNombre);
+            formData.append("fechaInicio", eventoFechaInicio.toISOString());
+            formData.append("fechaFinal", eventoFechaFinal.toISOString());
+            formData.append("costos", eventoCostos ? parseFloat(eventoCostos) : 0);
+            formData.append("descripcion", eventoDescripcion);
+            formData.append("horario", `${formatHora(eventoHoraInicio)} - ${formatHora(eventoHoraFin)}`);
+            formData.append("coordenadas", JSON.stringify({
+                latitud: coordsSeleccionadas.latitude,
+                longitud: coordsSeleccionadas.longitude,
+            }));
+            eventoFotos.forEach((foto, index) => {
+                formData.append("fotos", { uri: foto.uri, type: "image/jpeg", name: `foto_evento_${index}.jpg` });
+            });
             const response = await fetch(`${API_URL}/eventos`, {
                 method: "POST",
-                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    nombre: eventoNombre,
-                    fechaInicio: eventoFechaInicio.toISOString(),
-                    fechaFinal: eventoFechaFinal.toISOString(),
-                    costos: eventoCostos ? parseFloat(eventoCostos) : 0,
-                    descripcion: eventoDescripcion,
-                    horario: `${formatHora(eventoHoraInicio)} - ${formatHora(eventoHoraFin)}`,
-                    coordenadas: { latitud: coordsSeleccionadas.latitude, longitud: coordsSeleccionadas.longitude },
-                }),
+                headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+                body: formData,
             });
             const data = await response.json();
             if (response.ok) {
@@ -422,10 +417,23 @@ const Home = ({ navigation }) => {
     };
 
     const handleLogout = async () => {
-        await AsyncStorage.removeItem("token");
-        await AsyncStorage.removeItem("usuario");
-        closeMenu();
-        navigation.replace("Login");
+        Alert.alert(
+            "Cerrar sesión",
+            "¿Estás seguro que deseas cerrar sesión?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Cerrar sesión",
+                    style: "destructive",
+                    onPress: async () => {
+                        await AsyncStorage.removeItem("token");
+                        await AsyncStorage.removeItem("usuario");
+                        closeMenu();
+                        navigation.replace("Login");
+                    }
+                }
+            ]
+        );
     };
 
     const resultadosFiltrados = lugares.filter((lugar) => {
@@ -460,7 +468,7 @@ const Home = ({ navigation }) => {
             <MapView
                 ref={mapRef}
                 style={styles.map}
-                mapType={isDark ? "mutedStandard" : "standard"}
+                mapType="standard"
                 showsUserLocation={true}
                 showsMyLocationButton={false}
                 onLongPress={handleLongPress}
@@ -489,16 +497,14 @@ const Home = ({ navigation }) => {
                 }}
             >
                 {lugaresFiltrados.map((lugar) => (
-                    <Marker
+                    <MarkerPersonalizado
                         key={lugar._id}
+                        categoria={lugar.categoria}
                         coordinate={{ latitude: lugar.coordenadas.latitud, longitude: lugar.coordenadas.longitud }}
-                        title={lugar.nombre}
-                        description={lugar.descripcion}
-                        onPress={() => navigation.navigate("DetalleLugar", { lugar })}
-                        tracksViewChanges={false}
-                    >
-                        <MarkerPersonalizado categoria={lugar.categoria} />
-                    </Marker>
+                        titulo={lugar.nombre}
+                        descripcion={lugar.descripcion}
+                        onPress={() => navigation.navigate("DetalleLugar", { lugar, miUsuarioId })}
+                    />
                 ))}
                 {selectedPlace && (
                     <Marker

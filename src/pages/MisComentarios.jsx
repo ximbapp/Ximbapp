@@ -9,15 +9,42 @@ import { ThemeContext } from "../context/ThemeContext";
 
 const API_URL = "https://ximbapp.com/api";
 
+const AVATARES = [
+    { id: "camara", source: require("../assets/avatares/camara.png") },
+    { id: "colibri", source: require("../assets/avatares/colibri.png") },
+    { id: "elote", source: require("../assets/avatares/elote.png") },
+    { id: "tepecoza", source: require("../assets/avatares/tepecoza.png") },
+    { id: "xoloitzcuintle", source: require("../assets/avatares/xoloitzcuintle.png") },
+    { id: "bicicleta", source: require("../assets/avatares/bicicleta.png") },
+    { id: "brujula", source: require("../assets/avatares/brujula.png") },
+];
+
+const getAvatarSource = (avatarId) => {
+    const av = AVATARES.find(a => a.id === avatarId);
+    return av ? av.source : AVATARES[1].source;
+};
+
 const MisComentarios = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);
     const [comentarios, setComentarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [fotoZoom, setFotoZoom] = useState(null);
+    const [miAvatarId, setMiAvatarId] = useState("colibri");
+    const [miColorAvatar, setMiColorAvatar] = useState("#C9B3FF");
 
     useEffect(() => {
         cargarMisComentarios();
+        cargarMiAvatar();
     }, []);
+
+    const cargarMiAvatar = async () => {
+        try {
+            const avatar = await AsyncStorage.getItem('avatarSeleccionado');
+            const color = await AsyncStorage.getItem('colorAvatar');
+            if (avatar) setMiAvatarId(avatar);
+            if (color) setMiColorAvatar(color);
+        } catch (e) {}
+    };
 
     const cargarMisComentarios = async () => {
         try {
@@ -74,11 +101,23 @@ const MisComentarios = ({ navigation }) => {
                             onPress={() => item.lugar && navigation.navigate("DetalleLugar", { lugar: item.lugar })}
                         >
                             <View style={styles.cardHeader}>
-                                <MaterialIcons name="place" size={16} color="#e6007e" />
-                                <Text style={styles.cardLugar} numberOfLines={1}>
-                                    {item.lugar?.nombre || "Lugar eliminado"}
-                                </Text>
-                                <Text style={styles.cardFecha}>{formatFecha(item.createdAt)}</Text>
+                                {/* Avatar del usuario */}
+                                <View style={[styles.avatarMini, { backgroundColor: miColorAvatar }]}>
+                                    <Image
+                                        source={getAvatarSource(miAvatarId)}
+                                        style={styles.avatarMiniImg}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+                                <View style={styles.cardHeaderTexto}>
+                                    <View style={styles.cardLugarRow}>
+                                        <MaterialIcons name="place" size={14} color="#e6007e" />
+                                        <Text style={styles.cardLugar} numberOfLines={1}>
+                                            {item.lugar?.nombre || "Lugar eliminado"}
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.cardFecha}>{formatFecha(item.createdAt)}</Text>
+                                </View>
                             </View>
                             <Text style={styles.cardComentario}>{item.comentario}</Text>
                             {item.fotos && item.fotos.length > 0 && (
@@ -150,7 +189,29 @@ const styles = StyleSheet.create({
     cardHeader: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 6,
+        gap: 10,
+    },
+    avatarMini: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 1.5,
+        borderColor: "#e6007e",
+    },
+    avatarMiniImg: {
+        width: 26,
+        height: 26,
+    },
+    cardHeaderTexto: {
+        flex: 1,
+        gap: 2,
+    },
+    cardLugarRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
     },
     cardLugar: {
         flex: 1,

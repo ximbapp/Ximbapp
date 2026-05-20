@@ -134,31 +134,6 @@ const Ajustes = ({ navigation }) => {
                             { backgroundColor: isDark ? "#3A3A46" : "#fff" },
                         ]}
                     >
-                        <Text style={styles.sectionTitle}>Unidades de longitud</Text>
-
-                        <TouchableOpacity
-                            style={[styles.option, unidad === "Kilómetros" && styles.active]}
-                            onPress={() => setUnidad("Kilómetros")}
-                        >
-                            <MaterialIcons name="straighten" size={22} color="#e6007e" />
-                            <Text style={styles.optionText}>Kilómetros</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.option, unidad === "Millas" && styles.active]}
-                            onPress={() => setUnidad("Millas")}
-                        >
-                            <MaterialIcons name="straighten" size={22} color="#e6007e" />
-                            <Text style={styles.optionText}>Millas</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View
-                        style={[
-                            styles.card,
-                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                        ]}
-                    >
                         <Text style={styles.sectionTitle}>Historial</Text>
 
                         <TouchableOpacity
