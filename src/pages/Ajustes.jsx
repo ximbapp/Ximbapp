@@ -2,146 +2,87 @@ import React, { useContext, useState } from "react";
 import {
     View,
     Text,
-    StyleSheet,
     TouchableOpacity,
     Switch,
     ScrollView,
     Platform,
+    StyleSheet,
 } from "react-native";
 
 import { ThemeContext } from "../context/ThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
+import { globalStyles, COLORS } from "../theme/styles";
 
 const Ajustes = ({ navigation }) => {
     const { themeMode, setThemeMode, isDark } = useContext(ThemeContext);
 
     const [idioma, setIdioma] = useState("Español");
     const [notificaciones, setNotificaciones] = useState(true);
-    const [unidad, setUnidad] = useState("Kilómetros");
 
     const handleBorrarHistorial = () => {
         alert("Historial borrado (simulado)");
     };
 
     return (
-        <View
-            style={[
-                styles.container,
-                {
-                    backgroundColor: isDark ? "#3A3A46" : "#fff",
-                    alignItems: Platform.OS === "web" ? "center" : "stretch",
-                },
-            ]}
-        >
-            <View style={styles.webWrapper}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <MaterialIcons name="arrow-back" size={28} color="#e6007e" />
+        <View style={[globalStyles.container, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg, alignItems: Platform.OS === "web" ? "center" : "stretch" }]}>
+            <View style={globalStyles.webWrapper}>
+                <TouchableOpacity style={globalStyles.backButton} onPress={() => navigation.goBack()}>
+                    <MaterialIcons name="arrow-back" size={28} color={COLORS.primary} />
                 </TouchableOpacity>
 
-                <Text style={styles.title}>Configuración</Text>
+                <Text style={globalStyles.screenTitle}>Configuración</Text>
 
-                <ScrollView
-                    contentContainerStyle={styles.scrollContainer}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View
-                        style={[
-                            styles.card,
-                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                        ]}
-                    >
-                        <Text style={styles.sectionTitle}>Modo Oscuro</Text>
+                <ScrollView contentContainerStyle={globalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
 
-                        <TouchableOpacity
-                            style={[styles.option, themeMode === "auto" && styles.active]}
-                            onPress={() => setThemeMode("auto")}
-                        >
-                            <MaterialIcons name="brightness-auto" size={22} color="#e6007e" />
+                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitle}>Modo Oscuro</Text>
+                        <TouchableOpacity style={[styles.option, themeMode === "auto" && styles.active]} onPress={() => setThemeMode("auto")}>
+                            <MaterialIcons name="brightness-auto" size={22} color={COLORS.primary} />
                             <Text style={styles.optionText}>Automático</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.option, themeMode === "light" && styles.active]}
-                            onPress={() => setThemeMode("light")}
-                        >
-                            <MaterialIcons name="light-mode" size={22} color="#e6007e" />
+                        <TouchableOpacity style={[styles.option, themeMode === "light" && styles.active]} onPress={() => setThemeMode("light")}>
+                            <MaterialIcons name="light-mode" size={22} color={COLORS.primary} />
                             <Text style={styles.optionText}>Claro</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.option, themeMode === "dark" && styles.active]}
-                            onPress={() => setThemeMode("dark")}
-                        >
-                            <MaterialIcons name="dark-mode" size={22} color="#e6007e" />
+                        <TouchableOpacity style={[styles.option, themeMode === "dark" && styles.active]} onPress={() => setThemeMode("dark")}>
+                            <MaterialIcons name="dark-mode" size={22} color={COLORS.primary} />
                             <Text style={styles.optionText}>Oscuro</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <View
-                        style={[
-                            styles.card,
-                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                        ]}
-                    >
-                        <Text style={styles.sectionTitle}>Idioma</Text>
-
-                        <TouchableOpacity
-                            style={[styles.option, idioma === "Español" && styles.active]}
-                            onPress={() => setIdioma("Español")}
-                        >
-                            <MaterialIcons name="language" size={22} color="#e6007e" />
+                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitle}>Idioma</Text>
+                        <TouchableOpacity style={[styles.option, idioma === "Español" && styles.active]} onPress={() => setIdioma("Español")}>
+                            <MaterialIcons name="language" size={22} color={COLORS.primary} />
                             <Text style={styles.optionText}>Español</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.option, idioma === "Inglés" && styles.active]}
-                            onPress={() => setIdioma("Inglés")}
-                        >
-                            <MaterialIcons name="language" size={22} color="#e6007e" />
+                        <TouchableOpacity style={[styles.option, idioma === "Inglés" && styles.active]} onPress={() => setIdioma("Inglés")}>
+                            <MaterialIcons name="language" size={22} color={COLORS.primary} />
                             <Text style={styles.optionText}>Inglés</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <View
-                        style={[
-                            styles.card,
-                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                        ]}
-                    >
-                        <Text style={styles.sectionTitle}>Notificaciones</Text>
-
+                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitle}>Notificaciones</Text>
                         <View style={styles.switchRow}>
                             <View style={styles.switchLeft}>
-                                <MaterialIcons name="notifications" size={22} color="#e6007e" />
+                                <MaterialIcons name="notifications" size={22} color={COLORS.primary} />
                                 <Text style={styles.optionText}>Activar notificaciones</Text>
                             </View>
-
                             <Switch
                                 value={notificaciones}
                                 onValueChange={setNotificaciones}
-                                trackColor={{ false: "#ccc", true: "#e6007e" }}
-                                thumbColor={"#fff"}
+                                trackColor={{ false: "#ccc", true: COLORS.primary }}
+                                thumbColor={COLORS.blanco}
                             />
                         </View>
                     </View>
 
-                    <View
-                        style={[
-                            styles.card,
-                            { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-                        ]}
-                    >
-                        <Text style={styles.sectionTitle}>Historial</Text>
-
-                        <TouchableOpacity
-                            style={styles.deleteButton}
-                            onPress={handleBorrarHistorial}
-                        >
-                            <MaterialIcons name="delete" size={22} color="#fff" />
-                            <Text style={styles.deleteText}>Borrar historial</Text>
+                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitle}>Historial</Text>
+                        <TouchableOpacity style={globalStyles.btnPrimary} onPress={handleBorrarHistorial}>
+                            <MaterialIcons name="delete" size={22} color={COLORS.blanco} />
+                            <Text style={globalStyles.btnPrimaryText}>Borrar historial</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -155,54 +96,6 @@ const Ajustes = ({ navigation }) => {
 export default Ajustes;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-    },
-
-    webWrapper: {
-        width: "100%",
-        maxWidth: Platform.OS === "web" ? 650 : "100%",
-        flex: 1,
-    },
-
-    scrollContainer: {
-        paddingBottom: 40,
-    },
-
-    backButton: {
-        position: "absolute",
-        top: Platform.OS === "web" ? 15 : 45,
-        left: 0,
-        zIndex: 10,
-        padding: 5,
-    },
-
-    title: {
-        fontSize: 26,
-        fontWeight: "bold",
-        color: "#e6007e",
-        textAlign: "center",
-        marginTop: Platform.OS === "web" ? 15 : 45,
-        marginBottom: 20,
-    },
-
-    card: {
-        borderWidth: 1,
-        borderColor: "#e6007e",
-        borderRadius: 15,
-        padding: 18,
-        marginBottom: 18,
-    },
-
-    sectionTitle: {
-        fontSize: 16,
-        fontWeight: "bold",
-        color: "#e6007e",
-        marginBottom: 15,
-        textAlign: "center",
-    },
-
     option: {
         flexDirection: "row",
         alignItems: "center",
@@ -212,44 +105,23 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: 8,
     },
-
     optionText: {
         fontSize: 15,
-        color: "#e6007e",
+        color: COLORS.primary,
         fontWeight: "bold",
     },
-
     active: {
-        backgroundColor: "rgba(230,0,126,0.2)",
+        backgroundColor: COLORS.primaryLight,
     },
-
     switchRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         marginTop: 10,
     },
-
     switchLeft: {
         flexDirection: "row",
         alignItems: "center",
         gap: 10,
-    },
-
-    deleteButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 10,
-        backgroundColor: "#e6007e",
-        paddingVertical: 12,
-        borderRadius: 10,
-        marginTop: 10,
-    },
-
-    deleteText: {
-        color: "#fff",
-        fontWeight: "bold",
-        fontSize: 14,
     },
 });

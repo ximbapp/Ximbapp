@@ -6,6 +6,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeContext } from "../context/ThemeContext";
+import { globalStyles, COLORS } from "../theme/styles";
 
 const API_URL = "https://ximbapp.com/api";
 
@@ -30,7 +31,7 @@ const MisComentarios = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [fotoZoom, setFotoZoom] = useState(null);
     const [miAvatarId, setMiAvatarId] = useState("colibri");
-    const [miColorAvatar, setMiColorAvatar] = useState("#C9B3FF");
+    const [miColorAvatar, setMiColorAvatar] = useState(COLORS.avatarMorado);
 
     useEffect(() => {
         cargarMisComentarios();
@@ -64,25 +65,21 @@ const MisComentarios = ({ navigation }) => {
 
     const formatFecha = (fecha) => {
         const date = new Date(fecha);
-        return date.toLocaleDateString("es-MX", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
+        return date.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back" size={28} color="#e6007e" />
+                    <MaterialIcons name="arrow-back" size={28} color={COLORS.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Mis Comentarios</Text>
                 <View style={{ width: 28 }} />
             </View>
 
             {loading ? (
-                <ActivityIndicator color="#e6007e" style={{ marginTop: 40 }} />
+                <ActivityIndicator color={COLORS.primary} style={{ marginTop: 40 }} />
             ) : (
                 <FlatList
                     data={comentarios}
@@ -90,28 +87,23 @@ const MisComentarios = ({ navigation }) => {
                     contentContainerStyle={{ padding: 16 }}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View style={styles.empty}>
-                            <MaterialIcons name="chat-bubble-outline" size={60} color="rgba(230,0,126,0.3)" />
-                            <Text style={styles.emptyText}>Aún no has comentado nada</Text>
+                        <View style={globalStyles.emptyContainer}>
+                            <MaterialIcons name="chat-bubble-outline" size={60} color={COLORS.primaryMedium} />
+                            <Text style={globalStyles.emptyText}>Aún no has comentado nada</Text>
                         </View>
                     }
                     renderItem={({ item }) => (
                         <TouchableOpacity
-                            style={[styles.card, { backgroundColor: isDark ? "#2C2C36" : "#f5f5f5" }]}
+                            style={[styles.card, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard }]}
                             onPress={() => item.lugar && navigation.navigate("DetalleLugar", { lugar: item.lugar })}
                         >
                             <View style={styles.cardHeader}>
-                                {/* Avatar del usuario */}
                                 <View style={[styles.avatarMini, { backgroundColor: miColorAvatar }]}>
-                                    <Image
-                                        source={getAvatarSource(miAvatarId)}
-                                        style={styles.avatarMiniImg}
-                                        resizeMode="contain"
-                                    />
+                                    <Image source={getAvatarSource(miAvatarId)} style={styles.avatarMiniImg} resizeMode="contain" />
                                 </View>
                                 <View style={styles.cardHeaderTexto}>
                                     <View style={styles.cardLugarRow}>
-                                        <MaterialIcons name="place" size={14} color="#e6007e" />
+                                        <MaterialIcons name="place" size={14} color={COLORS.primary} />
                                         <Text style={styles.cardLugar} numberOfLines={1}>
                                             {item.lugar?.nombre || "Lugar eliminado"}
                                         </Text>
@@ -134,15 +126,12 @@ const MisComentarios = ({ navigation }) => {
                 />
             )}
 
-            {/* Modal zoom foto */}
             <Modal visible={!!fotoZoom} transparent animationType="fade" onRequestClose={() => setFotoZoom(null)}>
                 <View style={styles.modalZoom}>
                     <TouchableOpacity style={styles.modalCerrar} onPress={() => setFotoZoom(null)}>
-                        <MaterialIcons name="close" size={30} color="#fff" />
+                        <MaterialIcons name="close" size={30} color={COLORS.blanco} />
                     </TouchableOpacity>
-                    {fotoZoom && (
-                        <Image source={{ uri: fotoZoom }} style={styles.fotoZoom} resizeMode="contain" />
-                    )}
+                    {fotoZoom && <Image source={{ uri: fotoZoom }} style={styles.fotoZoom} resizeMode="contain" />}
                 </View>
             </Modal>
         </View>
@@ -161,99 +150,28 @@ const styles = StyleSheet.create({
         paddingTop: Platform.OS === "ios" ? 50 : 40,
         paddingBottom: 12,
         borderBottomWidth: 1,
-        borderBottomColor: "#e6007e",
+        borderBottomColor: COLORS.primary,
     },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        color: "#e6007e",
-    },
-    empty: {
-        alignItems: "center",
-        marginTop: 80,
-        gap: 12,
-    },
-    emptyText: {
-        color: "rgba(230,0,126,0.6)",
-        fontSize: 15,
-        fontWeight: "bold",
-    },
+    headerTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.primary },
     card: {
         borderRadius: 12,
         padding: 14,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: "rgba(230,0,126,0.3)",
+        borderColor: COLORS.primaryMedium,
         gap: 8,
     },
-    cardHeader: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-    },
-    avatarMini: {
-        width: 38,
-        height: 38,
-        borderRadius: 19,
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 1.5,
-        borderColor: "#e6007e",
-    },
-    avatarMiniImg: {
-        width: 26,
-        height: 26,
-    },
-    cardHeaderTexto: {
-        flex: 1,
-        gap: 2,
-    },
-    cardLugarRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 4,
-    },
-    cardLugar: {
-        flex: 1,
-        fontSize: 13,
-        fontWeight: "bold",
-        color: "#e6007e",
-    },
-    cardFecha: {
-        fontSize: 11,
-        color: "rgba(230,0,126,0.6)",
-    },
-    cardComentario: {
-        fontSize: 14,
-        color: "#e6007e",
-        lineHeight: 20,
-    },
-    fotosRow: {
-        flexDirection: "row",
-        gap: 8,
-        marginTop: 4,
-    },
-    fotoMini: {
-        width: 70,
-        height: 70,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: "rgba(230,0,126,0.3)",
-    },
-    modalZoom: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.95)",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    modalCerrar: {
-        position: "absolute",
-        top: Platform.OS === "ios" ? 55 : 40,
-        right: 20,
-        zIndex: 10,
-    },
-    fotoZoom: {
-        width: "100%",
-        height: "80%",
-    },
+    cardHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
+    avatarMini: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center", borderWidth: 1.5, borderColor: COLORS.primary },
+    avatarMiniImg: { width: 26, height: 26 },
+    cardHeaderTexto: { flex: 1, gap: 2 },
+    cardLugarRow: { flexDirection: "row", alignItems: "center", gap: 4 },
+    cardLugar: { flex: 1, fontSize: 13, fontWeight: "bold", color: COLORS.primary },
+    cardFecha: { fontSize: 11, color: COLORS.primaryFade },
+    cardComentario: { fontSize: 14, color: COLORS.primary, lineHeight: 20 },
+    fotosRow: { flexDirection: "row", gap: 8, marginTop: 4 },
+    fotoMini: { width: 70, height: 70, borderRadius: 8, borderWidth: 1, borderColor: COLORS.primaryMedium },
+    modalZoom: { flex: 1, backgroundColor: "rgba(0,0,0,0.95)", justifyContent: "center", alignItems: "center" },
+    modalCerrar: { position: "absolute", top: Platform.OS === "ios" ? 55 : 40, right: 20, zIndex: 10 },
+    fotoZoom: { width: "100%", height: "80%" },
 });

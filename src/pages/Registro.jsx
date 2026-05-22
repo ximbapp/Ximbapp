@@ -15,8 +15,9 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { globalStyles, COLORS } from "../theme/styles";
 
 const Registro = ({ navigation }) => {
     const { isDark } = useContext(ThemeContext);
@@ -95,18 +96,10 @@ const Registro = ({ navigation }) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    nombre: nombre.trim(),
-                    apellidoP: apellido_pa.trim(),
-                    apellidoM: apellido_ma.trim(),
-                    fechaNacimiento: fechaNacimiento.toISOString(),
-                    nacionalidad: nacionalidad.trim(),
-                    codigoPostal: codigo_postal.trim(),
-                    alcaldiaMunicipio: localidad.trim(),
-                    genero,
-                    telefono: telefono.trim(),
-                    email: correo.trim(),
-                    password,
-                    terminosAceptados: true,
+                    nombre: nombre.trim(), apellidoP: apellido_pa.trim(), apellidoM: apellido_ma.trim(),
+                    fechaNacimiento: fechaNacimiento.toISOString(), nacionalidad: nacionalidad.trim(),
+                    codigoPostal: codigo_postal.trim(), alcaldiaMunicipio: localidad.trim(),
+                    genero, telefono: telefono.trim(), email: correo.trim(), password, terminosAceptados: true,
                 })
             });
             const data = await response.json();
@@ -127,12 +120,12 @@ const Registro = ({ navigation }) => {
 
     const content = (
         <ScrollView
-            contentContainerStyle={[styles.container, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}
+            contentContainerStyle={[styles.container, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}
             keyboardShouldPersistTaps="always"
         >
             <Text style={styles.title}>Crear Cuenta</Text>
-            <View style={[styles.form, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
-                <Text style={[styles.formTitle, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>Registro</Text>
+            <View style={[styles.form, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                <Text style={[styles.formTitle, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>Registro</Text>
 
                 <FloatingInput label="Nombre" value={nombre} onChangeText={(t) => { setNombre(t); clearError("nombre"); }} isDark={isDark} error={errors.nombre} />
                 <FloatingInput label="Apellido Paterno" value={apellido_pa} onChangeText={(t) => { setApellido_pa(t); clearError("apellido_pa"); }} isDark={isDark} error={errors.apellido_pa} />
@@ -146,21 +139,13 @@ const Registro = ({ navigation }) => {
                                 <input
                                     type="date"
                                     onChange={(e) => {
-                                        if (e.target.value) {
-                                            setFechaNacimiento(new Date(e.target.value));
-                                            clearError("fechaNacimiento");
-                                        }
+                                        if (e.target.value) { setFechaNacimiento(new Date(e.target.value)); clearError("fechaNacimiento"); }
                                     }}
                                     style={{
-                                        width: "100%",
-                                        padding: "8px 4px",
-                                        backgroundColor: "transparent",
-                                        color: "#e6007e",
-                                        border: "none",
-                                        borderBottom: `2px solid ${errors.fechaNacimiento ? "#ff3b30" : "#e6007e"}`,
-                                        fontSize: "16px",
-                                        outline: "none",
-                                        cursor: "pointer",
+                                        width: "100%", padding: "8px 4px", backgroundColor: "transparent",
+                                        color: COLORS.primary, border: "none",
+                                        borderBottom: `2px solid ${errors.fechaNacimiento ? "#ff3b30" : COLORS.primary}`,
+                                        fontSize: "16px", outline: "none", cursor: "pointer",
                                     }}
                                 />
                                 {errors.fechaNacimiento ? <Text style={styles.errorText}>{errors.fechaNacimiento}</Text> : null}
@@ -180,29 +165,25 @@ const Registro = ({ navigation }) => {
                 <FloatingInput label="Localidad" value={localidad} onChangeText={(t) => { setLocalidad(t); clearError("localidad"); }} isDark={isDark} error={errors.localidad} />
 
                 <Text style={styles.selectLabel}>Género</Text>
-                <View style={[styles.selectContainer, { borderBottomColor: errors.genero ? "#ff3b30" : "#e6007e" }]}>
+                <View style={[styles.selectContainer, { borderBottomColor: errors.genero ? "#ff3b30" : COLORS.primary }]}>
                     {Platform.OS === "web" ? (
                         <select
                             value={genero}
                             onChange={(e) => { setGenero(e.target.value); clearError("genero"); }}
                             style={{
-                                width: "100%",
-                                padding: "12px 4px",
-                                backgroundColor: isDark ? "#3A3A46" : "#fff",
-                                color: genero ? "#e6007e" : "rgba(230,0,126,0.5)",
-                                border: "none",
-                                fontSize: "15px",
-                                outline: "none",
-                                cursor: "pointer",
+                                width: "100%", padding: "12px 4px",
+                                backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg,
+                                color: genero ? COLORS.primary : COLORS.primaryMedium,
+                                border: "none", fontSize: "15px", outline: "none", cursor: "pointer",
                             }}
                         >
-                            <option value="" style={{ color: "rgba(230,0,126,0.5)" }}>Selecciona una opción</option>
-                            <option value="Hombre" style={{ color: "#e6007e" }}>Hombre</option>
-                            <option value="Mujer" style={{ color: "#e6007e" }}>Mujer</option>
-                            <option value="Otro" style={{ color: "#e6007e" }}>Otro</option>
+                            <option value="">Selecciona una opción</option>
+                            <option value="Hombre">Hombre</option>
+                            <option value="Mujer">Mujer</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     ) : (
-                        <Picker selectedValue={genero} onValueChange={(v) => { setGenero(v); clearError("genero"); }} style={{ color: "#e6007e" }} dropdownIconColor="#e6007e">
+                        <Picker selectedValue={genero} onValueChange={(v) => { setGenero(v); clearError("genero"); }} style={{ color: COLORS.primary }} dropdownIconColor={COLORS.primary}>
                             <Picker.Item label="Selecciona una opción" value="" />
                             <Picker.Item label="Hombre" value="Hombre" />
                             <Picker.Item label="Mujer" value="Mujer" />
@@ -221,10 +202,10 @@ const Registro = ({ navigation }) => {
                 {/* Checkbox Términos */}
                 <View style={styles.terminosRow}>
                     <TouchableOpacity
-                        style={[styles.checkbox, terminosAceptados && styles.checkboxActivo]}
+                        style={[globalStyles.checkbox, terminosAceptados && globalStyles.checkboxActivo]}
                         onPress={() => { setTerminosAceptados(!terminosAceptados); clearError("terminos"); }}
                     >
-                        {terminosAceptados && <MaterialIcons name="check" size={16} color="#fff" />}
+                        {terminosAceptados && <MaterialIcons name="check" size={16} color={COLORS.blanco} />}
                     </TouchableOpacity>
                     <Text style={styles.terminosTexto}>Acepto los </Text>
                     <TouchableOpacity onPress={() => setModalTerminos(true)}>
@@ -233,8 +214,8 @@ const Registro = ({ navigation }) => {
                 </View>
                 {errors.terminos ? <Text style={styles.errorText}>{errors.terminos}</Text> : null}
 
-                <TouchableOpacity style={[styles.button, loading && { opacity: 0.7 }]} onPress={handleRegister} disabled={loading}>
-                    <Text style={styles.buttonText}>{loading ? "Creando cuenta..." : "Crear Cuenta"}</Text>
+                <TouchableOpacity style={[globalStyles.btnPrimary, { marginTop: 20 }, loading && { opacity: 0.7 }]} onPress={handleRegister} disabled={loading}>
+                    <Text style={globalStyles.btnPrimaryText}>{loading ? "Creando cuenta..." : "Crear Cuenta"}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -245,11 +226,11 @@ const Registro = ({ navigation }) => {
             {/* Modal Términos */}
             <Modal visible={modalTerminos} animationType="slide" transparent onRequestClose={() => setModalTerminos(false)}>
                 <View style={styles.modalOverlay}>
-                    <View style={[styles.modalContent, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
+                    <View style={[styles.modalContent, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>Términos y Condiciones</Text>
                             <TouchableOpacity onPress={() => setModalTerminos(false)}>
-                                <MaterialIcons name="close" size={26} color="#e6007e" />
+                                <MaterialIcons name="close" size={26} color={COLORS.primary} />
                             </TouchableOpacity>
                         </View>
                         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
@@ -273,8 +254,8 @@ const Registro = ({ navigation }) => {
                             <Text style={styles.tcTexto}>Correo: ximbapp@gmail.com{"\n"}Teléfono: 5549257864{"\n"}Dirección: Prol. Vicente Guerrero Sur 171, San Juan Tepenahuac, Milpa Alta 12800, CDMX</Text>
                             <View style={{ height: 20 }} />
                         </ScrollView>
-                        <TouchableOpacity style={styles.btnAceptar} onPress={() => { setTerminosAceptados(true); clearError("terminos"); setModalTerminos(false); }}>
-                            <Text style={styles.btnAceptarText}>Acepto los Términos y Condiciones</Text>
+                        <TouchableOpacity style={globalStyles.btnPrimary} onPress={() => { setTerminosAceptados(true); clearError("terminos"); setModalTerminos(false); }}>
+                            <Text style={globalStyles.btnPrimaryText}>Acepto los Términos y Condiciones</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -284,7 +265,7 @@ const Registro = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1, backgroundColor: isDark ? "#3A3A46" : "#fff" }}
+            style={{ flex: 1, backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             {Platform.OS === "web" ? content : (
@@ -297,42 +278,24 @@ const Registro = ({ navigation }) => {
 export default Registro;
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        justifyContent: "center",
-        padding: 30,
-        maxWidth: 560,
-        width: "100%",
-        alignSelf: "center",
-    },
-    title: { fontSize: 28, fontWeight: "bold", color: "#e6007e", textAlign: "center", marginBottom: 22 },
-    form: { borderColor: "#e6007e", borderWidth: 1, padding: 20, borderRadius: 15, position: "relative" },
-    formTitle: { position: "absolute", top: -12, alignSelf: "center", paddingHorizontal: 12, fontSize: 16, fontWeight: "bold", color: "#e6007e" },
-    button: { backgroundColor: "#e6007e", padding: 15, borderRadius: 10, marginTop: 20, alignItems: "center" },
-    buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-    link: { marginTop: 20, textAlign: "center", color: "#e6007e", fontSize: 14 },
-    dividerContainer: { flexDirection: "row", alignItems: "center", marginTop: 25 },
-    dividerLine: { flex: 1, height: 1, backgroundColor: "#e6007e", opacity: 0.5 },
-    dividerText: { marginHorizontal: 10, color: "#e6007e", fontSize: 14, fontWeight: "bold" },
-    socialContainer: { flexDirection: "row", justifyContent: "center", marginTop: 20, gap: 20 },
-    socialButton: { width: 55, height: 55, borderRadius: 12, borderWidth: 1, borderColor: "#e6007e", justifyContent: "center", alignItems: "center" },
-    selectLabel: { marginTop: 25, fontSize: 12, fontWeight: "bold", color: "#e6007e" },
+    container: { flexGrow: 1, justifyContent: "center", padding: 30, maxWidth: 560, width: "100%", alignSelf: "center" },
+    title: { fontSize: 28, fontWeight: "bold", color: COLORS.primary, textAlign: "center", marginBottom: 22 },
+    form: { borderColor: COLORS.primary, borderWidth: 1, padding: 20, borderRadius: 15, position: "relative" },
+    formTitle: { position: "absolute", top: -12, alignSelf: "center", paddingHorizontal: 12, fontSize: 16, fontWeight: "bold", color: COLORS.primary },
+    link: { marginTop: 20, textAlign: "center", color: COLORS.primary, fontSize: 14 },
+    selectLabel: { marginTop: 25, fontSize: 12, fontWeight: "bold", color: COLORS.primary },
     selectContainer: { borderBottomWidth: 2, marginTop: 5 },
     errorText: { marginTop: 6, color: "#ff3b30", fontSize: 12, fontWeight: "bold" },
     webDateContainer: { marginTop: 25 },
     terminosRow: { flexDirection: "row", alignItems: "center", marginTop: 20, flexWrap: "wrap" },
-    checkbox: { width: 22, height: 22, borderRadius: 5, borderWidth: 2, borderColor: "#e6007e", alignItems: "center", justifyContent: "center", marginRight: 8 },
-    checkboxActivo: { backgroundColor: "#e6007e" },
-    terminosTexto: { fontSize: 13, color: "#e6007e" },
-    terminosLink: { fontSize: 13, color: "#e6007e", fontWeight: "bold", textDecorationLine: "underline" },
+    terminosTexto: { fontSize: 13, color: COLORS.primary },
+    terminosLink: { fontSize: 13, color: COLORS.primary, fontWeight: "bold", textDecorationLine: "underline" },
     modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-    modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, borderWidth: 1, borderColor: "#e6007e", padding: 20, maxHeight: "90%", flex: 1, marginTop: 60 },
-    modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16, borderBottomWidth: 1, borderBottomColor: "rgba(230,0,126,0.3)", paddingBottom: 12 },
-    modalTitle: { fontSize: 17, fontWeight: "bold", color: "#e6007e" },
-    tcTitulo: { fontSize: 14, fontWeight: "bold", color: "#e6007e", textAlign: "center", marginBottom: 16, lineHeight: 20 },
-    tcSeccion: { fontSize: 13, fontWeight: "bold", color: "#e6007e", marginTop: 16, marginBottom: 8, textDecorationLine: "underline" },
-    tcSubtitulo: { fontSize: 12, fontWeight: "bold", color: "#e6007e", marginTop: 12, marginBottom: 4 },
-    tcTexto: { fontSize: 12, color: "#e6007e", lineHeight: 18, opacity: 0.85 },
-    btnAceptar: { backgroundColor: "#e6007e", padding: 14, borderRadius: 10, alignItems: "center", marginTop: 12 },
-    btnAceptarText: { color: "#fff", fontWeight: "bold", fontSize: 14 },
+    modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, borderWidth: 1, borderColor: COLORS.primary, padding: 20, maxHeight: "90%", flex: 1, marginTop: 60 },
+    modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16, borderBottomWidth: 1, borderBottomColor: COLORS.primaryMedium, paddingBottom: 12 },
+    modalTitle: { fontSize: 17, fontWeight: "bold", color: COLORS.primary },
+    tcTitulo: { fontSize: 14, fontWeight: "bold", color: COLORS.primary, textAlign: "center", marginBottom: 16, lineHeight: 20 },
+    tcSeccion: { fontSize: 13, fontWeight: "bold", color: COLORS.primary, marginTop: 16, marginBottom: 8, textDecorationLine: "underline" },
+    tcSubtitulo: { fontSize: 12, fontWeight: "bold", color: COLORS.primary, marginTop: 12, marginBottom: 4 },
+    tcTexto: { fontSize: 12, color: COLORS.primary, lineHeight: 18, opacity: 0.85 },
 });

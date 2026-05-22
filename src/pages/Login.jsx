@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FloatingInput from "../components/FloatingInput";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeContext } from "../context/ThemeContext";
+import { globalStyles, COLORS } from "../theme/styles";
 
 const DOWNLOAD_URL = "https://expo.dev";
 
@@ -33,49 +34,30 @@ const Login = ({ navigation }) => {
         return regex.test(correo);
     };
 
-    const clearError = (campo) => {
-        setErrors((prev) => ({ ...prev, [campo]: "" }));
-    };
+    const clearError = (campo) => setErrors((prev) => ({ ...prev, [campo]: "" }));
 
     const handleLogin = async () => {
         let newErrors = {};
-
-        if (email.trim() === "") {
-            newErrors.email = "El correo es obligatorio";
-        } else if (!validarEmail(email.trim())) {
-            newErrors.email = "Ingresa un correo válido (ejemplo@correo.com)";
-        }
-
-        if (password.trim() === "") {
-            newErrors.password = "La contraseña es obligatoria";
-        }
-
+        if (email.trim() === "") newErrors.email = "El correo es obligatorio";
+        else if (!validarEmail(email.trim())) newErrors.email = "Ingresa un correo válido (ejemplo@correo.com)";
+        if (password.trim() === "") newErrors.password = "La contraseña es obligatoria";
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
         try {
             setLoading(true);
-
             const response = await fetch('https://ximbapp.com/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: email.trim(),
-                    password: password
-                })
+                body: JSON.stringify({ email: email.trim(), password })
             });
-
             const data = await response.json();
-
             if (response.ok) {
                 await AsyncStorage.setItem('token', data.token);
                 await AsyncStorage.setItem('usuario', JSON.stringify(data.usuario));
                 navigation.replace("Home");
             } else {
-                setErrors({
-                    email: data.mensaje,
-                    password: data.mensaje,
-                });
+                setErrors({ email: data.mensaje, password: data.mensaje });
             }
         } catch (error) {
             setErrors({ email: "Error de conexión con el servidor" });
@@ -86,59 +68,33 @@ const Login = ({ navigation }) => {
 
     const content = (
         <ScrollView
-            contentContainerStyle={[
-                styles.container,
-                { backgroundColor: isDark ? "#3A3A46" : "#fff" },
-            ]}
+            contentContainerStyle={[styles.container, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}
             keyboardShouldPersistTaps="always"
         >
-            <Image
-                source={require("../../assets/images/Ximbapp.png")}
-                style={styles.logo}
-            />
+            <Image source={require("../../assets/images/Ximbapp.png")} style={styles.logo} />
 
             <Text style={styles.title}>Tu lugar perfecto a un click de distancia</Text>
 
-            <View style={[styles.form, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
-                <Text style={[styles.formTitle, { backgroundColor: isDark ? "#3A3A46" : "#fff" }]}>
+            <View style={[styles.form, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                <Text style={[styles.formTitle, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
                     Iniciar Sesión
                 </Text>
 
                 <FloatingInput
-                    label="Email"
-                    value={email}
-                    onChangeText={(text) => {
-                        setEmail(text);
-                        clearError("email");
-                    }}
-                    isDark={isDark}
-                    error={errors.email}
-                    keyboardType="email-address"
+                    label="Email" value={email}
+                    onChangeText={(text) => { setEmail(text); clearError("email"); }}
+                    isDark={isDark} error={errors.email} keyboardType="email-address"
                 />
-
                 <FloatingInput
-                    label="Contraseña"
-                    value={password}
-                    onChangeText={(text) => {
-                        setPassword(text);
-                        clearError("password");
-                    }}
-                    secureTextEntry
-                    isDark={isDark}
-                    error={errors.password}
+                    label="Contraseña" value={password}
+                    onChangeText={(text) => { setPassword(text); clearError("password"); }}
+                    secureTextEntry isDark={isDark} error={errors.password}
                 />
 
-                <TouchableOpacity
-                    style={[styles.button, loading && { opacity: 0.7 }]}
-                    onPress={handleLogin}
-                    disabled={loading}
-                >
-                    <Text style={styles.buttonText}>
-                        {loading ? "Entrando..." : "Entrar"}
-                    </Text>
+                <TouchableOpacity style={[globalStyles.btnPrimary, { marginTop: 35 }, loading && { opacity: 0.7 }]} onPress={handleLogin} disabled={loading}>
+                    <Text style={globalStyles.btnPrimaryText}>{loading ? "Entrando..." : "Entrar"}</Text>
                 </TouchableOpacity>
 
-                {/* ← Aquí está el cambio, ahora navega a OlvidePassword */}
                 <TouchableOpacity onPress={() => navigation.navigate("OlvidePassword")}>
                     <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
                 </TouchableOpacity>
@@ -149,11 +105,8 @@ const Login = ({ navigation }) => {
             </View>
 
             {Platform.OS === "web" && (
-                <TouchableOpacity
-                    style={styles.downloadButton}
-                    onPress={() => Linking.openURL(DOWNLOAD_URL)}
-                >
-                    <Ionicons name="download-outline" size={22} color="#fff" />
+                <TouchableOpacity style={styles.downloadButton} onPress={() => Linking.openURL(DOWNLOAD_URL)}>
+                    <Ionicons name="download-outline" size={22} color={COLORS.blanco} />
                     <Text style={styles.downloadButtonText}>Descargar la app</Text>
                 </TouchableOpacity>
             )}
@@ -162,15 +115,11 @@ const Login = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1, backgroundColor: isDark ? "#3A3A46" : "#fff" }}
+            style={{ flex: 1, backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-            {Platform.OS === "web" ? (
-                content
-            ) : (
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    {content}
-                </TouchableWithoutFeedback>
+            {Platform.OS === "web" ? content : (
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>{content}</TouchableWithoutFeedback>
             )}
         </KeyboardAvoidingView>
     );
@@ -192,10 +141,10 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 20,
         textAlign: "center",
-        color: "#e6007e",
+        color: COLORS.primary,
     },
     form: {
-        borderColor: "#e6007e",
+        borderColor: COLORS.primary,
         borderWidth: 1,
         padding: 20,
         borderRadius: 15,
@@ -209,25 +158,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         fontSize: 16,
         fontWeight: "bold",
-        color: "#e6007e",
-    },
-    button: {
-        backgroundColor: "#e6007e",
-        padding: 15,
-        borderRadius: 10,
-        marginTop: 35,
-        alignItems: "center",
-    },
-    buttonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "bold",
+        color: COLORS.primary,
     },
     link: {
         marginTop: 15,
         textAlign: "center",
         fontSize: 14,
-        color: "#e6007e",
+        color: COLORS.primary,
     },
     logo: {
         width: 160,
@@ -236,44 +173,12 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         resizeMode: "contain",
     },
-    dividerContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: 25,
-    },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: "#e6007e",
-        opacity: 0.5,
-    },
-    dividerText: {
-        marginHorizontal: 10,
-        color: "#e6007e",
-        fontSize: 14,
-        fontWeight: "bold",
-    },
-    socialContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 20,
-        gap: 20,
-    },
-    socialButton: {
-        width: 55,
-        height: 55,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#e6007e",
-        justifyContent: "center",
-        alignItems: "center",
-    },
     downloadButton: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         gap: 8,
-        backgroundColor: "#e6007e",
+        backgroundColor: COLORS.primary,
         paddingVertical: 14,
         paddingHorizontal: 30,
         borderRadius: 12,
@@ -283,7 +188,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     downloadButtonText: {
-        color: "#fff",
+        color: COLORS.blanco,
         fontSize: 16,
         fontWeight: "bold",
     },
