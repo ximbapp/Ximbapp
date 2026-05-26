@@ -68,6 +68,30 @@ const MisComentarios = ({ navigation }) => {
         return date.toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" });
     };
 
+    const handlePresionarComentario = (item) => {
+        if (item.evento) {
+            navigation.navigate("DetalleEvento", { evento: item.evento });
+        } else if (item.lugar) {
+            navigation.navigate("DetalleLugar", { lugar: item.lugar });
+        }
+    };
+
+    const getNombre = (item) => {
+        if (item.evento) return item.evento.nombre || "Evento eliminado";
+        if (item.lugar) return item.lugar.nombre || "Lugar eliminado";
+        return "Eliminado";
+    };
+
+    const getIcono = (item) => {
+        if (item.evento) return "event";
+        return "place";
+    };
+
+    const getColor = (item) => {
+        if (item.evento) return COLORS.evento;
+        return COLORS.primary;
+    };
+
     return (
         <View style={[styles.container, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
             <View style={styles.header}>
@@ -95,7 +119,7 @@ const MisComentarios = ({ navigation }) => {
                     renderItem={({ item }) => (
                         <TouchableOpacity
                             style={[styles.card, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard }]}
-                            onPress={() => item.lugar && navigation.navigate("DetalleLugar", { lugar: item.lugar })}
+                            onPress={() => handlePresionarComentario(item)}
                         >
                             <View style={styles.cardHeader}>
                                 <View style={[styles.avatarMini, { backgroundColor: miColorAvatar }]}>
@@ -103,9 +127,9 @@ const MisComentarios = ({ navigation }) => {
                                 </View>
                                 <View style={styles.cardHeaderTexto}>
                                     <View style={styles.cardLugarRow}>
-                                        <MaterialIcons name="place" size={14} color={COLORS.primary} />
-                                        <Text style={styles.cardLugar} numberOfLines={1}>
-                                            {item.lugar?.nombre || "Lugar eliminado"}
+                                        <MaterialIcons name={getIcono(item)} size={14} color={getColor(item)} />
+                                        <Text style={[styles.cardLugar, { color: getColor(item) }]} numberOfLines={1}>
+                                            {getNombre(item)}
                                         </Text>
                                     </View>
                                     <Text style={styles.cardFecha}>{formatFecha(item.createdAt)}</Text>

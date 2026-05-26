@@ -66,6 +66,8 @@ const DetalleLugar = ({ route, navigation }) => {
     const [fotoComentarioZoom, setFotoComentarioZoom] = useState(null);
     const [miAvatarId, setMiAvatarId] = useState("colibri");
     const [miColorAvatar, setMiColorAvatar] = useState(COLORS.avatarMorado);
+
+    // Estados edición lugar
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editNombre, setEditNombre] = useState("");
     const [editLocalidad, setEditLocalidad] = useState("");
@@ -78,6 +80,12 @@ const DetalleLugar = ({ route, navigation }) => {
     const [showPickerHoraInicio, setShowPickerHoraInicio] = useState(false);
     const [showPickerHoraFin, setShowPickerHoraFin] = useState(false);
     const [guardandoEdicion, setGuardandoEdicion] = useState(false);
+
+    // Estados edición comentario
+    const [editComentarioModal, setEditComentarioModal] = useState(false);
+    const [comentarioEditando, setComentarioEditando] = useState(null);
+    const [textoEditandoComentario, setTextoEditandoComentario] = useState("");
+    const [guardandoComentario, setGuardandoComentario] = useState(false);
 
     const flatListRef = useRef(null);
     const zoomRef = useRef(null);
@@ -126,11 +134,63 @@ const DetalleLugar = ({ route, navigation }) => {
     const cargarComentarios = async () => {
         try {
             setLoadingComentarios(true);
-            const response = await fetch(`${API_URL}/comentarios/${lugar._id}`);
+            const response = await fetch(`${API_URL}/comentarios/lugar/${lugar._id}`);
             const data = await response.json();
             setComentarios(data.comentarios || []);
         } catch (error) { console.log("Error cargando comentarios:", error); }
         finally { setLoadingComentarios(false); }
+    };
+
+    // ── Editar comentario ──
+    const abrirEditarComentario = (item) => {
+        setComentarioEditando(item);
+        setTextoEditandoComentario(item.comentario);
+        setEditComentarioModal(true);
+    };
+
+    const handleGuardarComentario = async () => {
+        if (!textoEditandoComentario.trim()) { Alert.alert("Error", "El comentario no puede estar vacío"); return; }
+        try {
+            setGuardandoComentario(true);
+            const token = await AsyncStorage.getItem("token");
+            const response = await fetch(`${API_URL}/comentarios/${comentarioEditando._id}`, {
+                method: "PUT",
+                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ comentario: textoEditandoComentario.trim() }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setEditComentarioModal(false);
+                await cargarComentarios();
+                Alert.alert("Comentario actualizado");
+            } else Alert.alert("Error", data.mensaje);
+        } catch (error) { Alert.alert("Error", "No se pudo actualizar el comentario"); }
+        finally { setGuardandoComentario(false); }
+    };
+
+    // ── Eliminar comentario ──
+    const handleEliminarComentario = (item) => {
+        Alert.alert(
+            "Eliminar comentario",
+            "¿Estás seguro que deseas eliminar este comentario?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Eliminar", style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const token = await AsyncStorage.getItem("token");
+                            const response = await fetch(`${API_URL}/comentarios/${item._id}`, {
+                                method: "DELETE",
+                                headers: { Authorization: `Bearer ${token}` },
+                            });
+                            if (response.ok) await cargarComentarios();
+                            else { const data = await response.json(); Alert.alert("Error", data.mensaje); }
+                        } catch (error) { Alert.alert("Error", "No se pudo eliminar el comentario"); }
+                    }
+                }
+            ]
+        );
     };
 
     const abrirEdicion = () => {
@@ -184,7 +244,7 @@ const DetalleLugar = ({ route, navigation }) => {
             editFotos.forEach((foto, index) => formData.append("fotos", { uri: foto.uri, type: "image/jpeg", name: `foto_edit_${index}.jpg` }));
             const response = await fetch(`${API_URL}/lugares/${lugar._id}`, { method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }, body: formData });
             const data = await response.json();
-            if (response.ok) { setLugar(data.lugar); setEditModalVisible(false); Alert.alert("✅", "Lugar actualizado correctamente"); }
+            if (response.ok) { setLugar(data.lugar); setEditModalVisible(false); Alert.alert("Lugar actualizado correctamente"); }
             else Alert.alert("Error", data.mensaje);
         } catch (error) { Alert.alert("Error", "No se pudo actualizar el lugar"); }
         finally { setGuardandoEdicion(false); }
@@ -416,30 +476,73 @@ const DetalleLugar = ({ route, navigation }) => {
                                 </View>
                             }
                             ListEmptyComponent={<Text style={styles.sinComentarios}>No hay comentarios aún. ¡Sé el primero!</Text>}
-                            renderItem={({ item }) => (
-                                <View style={[styles.comentarioCard, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard }]}>
-                                    <View style={styles.comentarioHeader}>
-                                        <AvatarComentario avatarId={item.usuario?.avatarId} color={item.usuario?.colorAvatar} />
-                                        <Text style={styles.comentarioUsuario}>{item.usuario?.nombre}</Text>
-                                        <Text style={styles.comentarioFecha}>{formatFecha(item.createdAt)}</Text>
-                                    </View>
-                                    <Text style={styles.comentarioTexto}>{item.comentario}</Text>
-                                    {item.fotos && item.fotos.length > 0 && (
-                                        <View style={styles.comentarioFotos}>
-                                            {item.fotos.map((foto, index) => (
-                                                <TouchableOpacity key={index} onPress={() => setFotoComentarioZoom(foto)}>
-                                                    <Image source={{ uri: foto }} style={styles.comentarioFoto} />
-                                                </TouchableOpacity>
-                                            ))}
+                            renderItem={({ item }) => {
+                                const esMiComentario = miUsuarioId && item.usuario?._id && item.usuario._id === miUsuarioId;
+                                return (
+                                    <View style={[styles.comentarioCard, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard }]}>
+                                        <View style={styles.comentarioHeader}>
+                                            <AvatarComentario avatarId={item.usuario?.avatarId} color={item.usuario?.colorAvatar} />
+                                            <Text style={styles.comentarioUsuario}>{item.usuario?.nombre}</Text>
+                                            <Text style={styles.comentarioFecha}>{formatFecha(item.createdAt)}</Text>
+                                            {/* Botones editar/eliminar solo si es mi comentario */}
+                                            {esMiComentario && (
+                                                <View style={styles.comentarioBotones}>
+                                                    <TouchableOpacity onPress={() => abrirEditarComentario(item)} style={styles.btnComentarioAccion}>
+                                                        <MaterialIcons name="edit" size={16} color={COLORS.azul} />
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity onPress={() => handleEliminarComentario(item)} style={styles.btnComentarioAccion}>
+                                                        <MaterialIcons name="delete" size={16} color={COLORS.rojo} />
+                                                    </TouchableOpacity>
+                                                </View>
+                                            )}
                                         </View>
-                                    )}
-                                </View>
-                            )}
+                                        <Text style={styles.comentarioTexto}>{item.comentario}</Text>
+                                        {item.fotos && item.fotos.length > 0 && (
+                                            <View style={styles.comentarioFotos}>
+                                                {item.fotos.map((foto, index) => (
+                                                    <TouchableOpacity key={index} onPress={() => setFotoComentarioZoom(foto)}>
+                                                        <Image source={{ uri: foto }} style={styles.comentarioFoto} />
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View>
+                                        )}
+                                    </View>
+                                );
+                            }}
                             ListFooterComponent={<View style={{ height: 30 }} />}
                         />
                     )}
                 </View>
             )}
+
+            {/* MODAL EDITAR COMENTARIO */}
+            <Modal visible={editComentarioModal} transparent animationType="slide" onRequestClose={() => setEditComentarioModal(false)}>
+                <View style={globalStyles.modalOverlay}>
+                    <View style={[globalStyles.modalContent, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
+                        <View style={globalStyles.modalHeader}>
+                            <Text style={globalStyles.modalTitle}>Editar comentario</Text>
+                            <TouchableOpacity onPress={() => setEditComentarioModal(false)}>
+                                <MaterialIcons name="close" size={26} color={COLORS.primary} />
+                            </TouchableOpacity>
+                        </View>
+                        <TextInput
+                            style={[styles.comentarioInput, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard, color: COLORS.primary, marginTop: 8 }]}
+                            value={textoEditandoComentario}
+                            onChangeText={setTextoEditandoComentario}
+                            multiline
+                            numberOfLines={4}
+                            placeholderTextColor={COLORS.primaryFade}
+                        />
+                        <TouchableOpacity
+                            style={[globalStyles.saveButton, guardandoComentario && { opacity: 0.7 }]}
+                            onPress={handleGuardarComentario}
+                            disabled={guardandoComentario}
+                        >
+                            <Text style={globalStyles.saveButtonText}>{guardandoComentario ? "Guardando..." : "Guardar cambios"}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
 
             {/* MODAL EDITAR LUGAR */}
             <Modal visible={editModalVisible} transparent animationType="slide" onRequestClose={() => setEditModalVisible(false)}>
@@ -565,6 +668,8 @@ const styles = StyleSheet.create({
     comentarioHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 },
     comentarioUsuario: { fontSize: 13, fontWeight: "bold", color: COLORS.primary, flex: 1 },
     comentarioFecha: { fontSize: 11, color: COLORS.primaryFade },
+    comentarioBotones: { flexDirection: "row", gap: 4 },
+    btnComentarioAccion: { padding: 4 },
     comentarioTexto: { fontSize: 14, color: COLORS.primary, lineHeight: 20 },
     comentarioFotos: { flexDirection: "row", gap: 8, marginTop: 10 },
     comentarioFoto: { width: 80, height: 80, borderRadius: 8, borderWidth: 1, borderColor: COLORS.primaryMedium },
