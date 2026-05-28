@@ -194,7 +194,7 @@ const Perfil = ({ navigation }) => {
                     <MaterialIcons name="arrow-back" size={28} color={COLORS.primary} />
                 </TouchableOpacity>
 
-                <Text style={globalStyles.screenTitle}>Perfil</Text>
+                <Text style={globalStyles.screenTitlePerfil}>Perfil</Text>
 
                 <ScrollView contentContainerStyle={globalStyles.scrollContainer} showsVerticalScrollIndicator={false}>
 
@@ -244,34 +244,34 @@ const Perfil = ({ navigation }) => {
                                         />
                                     ))}
                                 </View>
-                                <TouchableOpacity style={globalStyles.btnOutline} onPress={() => setModalAvatar(false)}>
-                                    <Text style={globalStyles.btnOutlineText}>Listo</Text>
+                                <TouchableOpacity style={globalStyles.btnOutlineIcono} onPress={() => setModalAvatar(false)}>
+                                    <Text style={globalStyles.btnOutlineTextIcono}>Listo</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </Modal>
 
                     {/* DATOS PERSONALES */}
-                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightBg }]}>
-                        <Text style={globalStyles.sectionTitle}>Datos personales</Text>
+                    <View style={[globalStyles.cardDatosPersonales, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitleDatosPersonales}>Datos personales</Text>
 
                         <Text style={globalStyles.label}>Nombre</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={nombre} onChangeText={setNombre} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={nombre} onChangeText={setNombre} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.nombre || "—"}</Text>
                         )}
 
                         <Text style={globalStyles.label}>Apellido Paterno</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={apellidoP} onChangeText={setApellidoP} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={apellidoP} onChangeText={setApellidoP} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.apellidoP || "—"}</Text>
                         )}
 
                         <Text style={globalStyles.label}>Apellido Materno</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={apellidoM} onChangeText={setApellidoM} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={apellidoM} onChangeText={setApellidoM} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.apellidoM || "—"}</Text>
                         )}
@@ -281,54 +281,54 @@ const Perfil = ({ navigation }) => {
 
                         <Text style={globalStyles.label}>Género</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={genero} onChangeText={setGenero} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={genero} onChangeText={setGenero} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.genero || "—"}</Text>
                         )}
 
                         <Text style={globalStyles.label}>Teléfono</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={telefono} onChangeText={setTelefono} keyboardType="numeric" maxLength={10} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={telefono} onChangeText={setTelefono} keyboardType="numeric" maxLength={10} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.telefono || "—"}</Text>
                         )}
                     </View>
 
                     {/* UBICACIÓN */}
-                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightBg }]}>
-                        <Text style={globalStyles.sectionTitle}>Ubicación</Text>
+                    <View style={[globalStyles.cardDatosPersonales, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitleDatosPersonales}>Ubicación</Text>
 
                         <Text style={globalStyles.label}>Código Postal</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={codigoPostal} onChangeText={setCodigoPostal} keyboardType="numeric" maxLength={5} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={codigoPostal} onChangeText={setCodigoPostal} keyboardType="numeric" maxLength={5} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.codigoPostal || "—"}</Text>
                         )}
 
                         <Text style={globalStyles.label}>Localidad</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={alcaldiaMunicipio} onChangeText={setAlcaldiaMunicipio} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={alcaldiaMunicipio} onChangeText={setAlcaldiaMunicipio} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.alcaldiaMunicipio || "—"}</Text>
                         )}
 
                         <Text style={globalStyles.label}>Nacionalidad</Text>
                         {editando ? (
-                            <TextInput style={[globalStyles.input, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primary }]} value={nacionalidad} onChangeText={setNacionalidad} placeholderTextColor={COLORS.primaryMedium} />
+                            <TextInput style={[globalStyles.inputEditar, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightCard, color: COLORS.primaryUsuario }]} value={nacionalidad} onChangeText={setNacionalidad} placeholderTextColor={COLORS.primaryMedium} />
                         ) : (
                             <Text style={globalStyles.value}>{usuario?.nacionalidad || "—"}</Text>
                         )}
                     </View>
 
                     {/* CUENTA */}
-                    <View style={[globalStyles.card, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightBg }]}>
-                        <Text style={globalStyles.sectionTitle}>Cuenta</Text>
+                    <View style={[globalStyles.cardDatosPersonales, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightBg }]}>
+                        <Text style={globalStyles.sectionTitleDatosPersonales}>Cuenta</Text>
                         <Text style={globalStyles.label}>Correo</Text>
                         <Text style={globalStyles.value}>{usuario?.email || "—"}</Text>
                     </View>
 
                     {!editando && (
-                        <TouchableOpacity style={globalStyles.btnPrimary} onPress={() => setEditando(true)}>
+                        <TouchableOpacity style={globalStyles.btnPrimaryEditar} onPress={() => setEditando(true)}>
                             <MaterialIcons name="edit" size={20} color={COLORS.blanco} />
                             <Text style={globalStyles.btnPrimaryText}>Editar perfil</Text>
                         </TouchableOpacity>
@@ -336,11 +336,11 @@ const Perfil = ({ navigation }) => {
 
                     {editando && (
                         <View style={styles.botonesEdicion}>
-                            <TouchableOpacity style={[globalStyles.btnPrimary, guardando && { opacity: 0.7 }]} onPress={handleGuardar} disabled={guardando}>
+                            <TouchableOpacity style={[globalStyles.btnPrimaryEditar, guardando && { opacity: 0.7 }]} onPress={handleGuardar} disabled={guardando}>
                                 <Text style={globalStyles.btnPrimaryText}>{guardando ? "Guardando..." : "Guardar cambios"}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={globalStyles.btnOutline} onPress={handleCancelar}>
-                                <Text style={globalStyles.btnOutlineText}>Cancelar</Text>
+                            <TouchableOpacity style={globalStyles.btnOutlineCancelarEdit} onPress={handleCancelar}>
+                                <Text style={globalStyles.btnOutlineTextCancelarEdit}>Cancelar</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -360,15 +360,15 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 24,
         padding: 24,
         borderWidth: 1,
-        borderColor: COLORS.primary,
+        borderColor: COLORS.primaryContenidoDark,
     },
-    modalTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.primary, textAlign: "center", marginBottom: 20 },
+    modalTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.primaryContenidoLight, textAlign: "center", marginBottom: 20 },
     avataresGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 16, marginBottom: 20 },
     avatarOpcion: { width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: COLORS.primaryMedium, alignItems: "center", justifyContent: "center" },
-    avatarOpcionSeleccionada: { borderColor: COLORS.primary, borderWidth: 3 },
+    avatarOpcionSeleccionada: { borderColor: COLORS.primaryContenidoDark, borderWidth: 3 },
     avatarOpcionImage: { width: 55, height: 55 },
     coloresGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 12, marginBottom: 20 },
     colorOpcion: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: "transparent" },
-    colorOpcionSeleccionada: { borderColor: COLORS.primary, borderWidth: 3, transform: [{ scale: 1.2 }] },
+    colorOpcionSeleccionada: { borderColor: COLORS.primaryContenidoDark, borderWidth: 3, transform: [{ scale: 1.2 }] },
     botonesEdicion: { gap: 12, marginBottom: 20 },
 });

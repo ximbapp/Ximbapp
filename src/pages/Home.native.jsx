@@ -590,41 +590,41 @@ const Home = ({ navigation }) => {
                 <Pressable style={styles.overlay} onPress={closeMenu}>
                     <Animated.View style={[styles.drawer, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg, transform: [{ translateX: slideAnim }] }]}>
                         <Text style={styles.drawerTitle}>Menú</Text>
-                        <TouchableOpacity style={styles.drawerItem} onPress={() => { closeMenu(); navigation.navigate("Perfil"); }}>
-                            <MaterialIcons name="person" size={22} color={COLORS.primary} />
+                        <TouchableOpacity style={styles.drawerItem}  onPress={() => { closeMenu(); navigation.navigate("Perfil"); }}>
+                            <MaterialIcons name="person" size={22} color={COLORS.primaryContenidoLight} />
                             <Text style={styles.drawerText}>Perfil</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.drawerItem} onPress={() => { closeMenu(); navigation.navigate("Ajustes"); }}>
-                            <MaterialIcons name="settings" size={22} color={COLORS.primary} />
+                            <MaterialIcons name="settings" size={22} color={COLORS.primaryContenidoLight} />
                             <Text style={styles.drawerText}>Ajustes</Text>
                         </TouchableOpacity>
                         <Text style={styles.drawerSectionTitle}>Mi contenido</Text>
                         <TouchableOpacity style={styles.drawerItem} onPress={() => { closeMenu(); navigation.navigate("MisLugares"); }}>
-                            <MaterialIcons name="place" size={22} color={COLORS.primary} />
+                            <MaterialIcons name="place" size={22} color={COLORS.primaryContenido} />
                             <Text style={styles.drawerText}>Mis Lugares</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.drawerItem} onPress={() => { closeMenu(); navigation.navigate("MisComentarios"); }}>
-                            <MaterialIcons name="chat-bubble-outline" size={22} color={COLORS.primary} />
+                            <MaterialIcons name="chat-bubble-outline" size={22} color={COLORS.primaryContenido} />
                             <Text style={styles.drawerText}>Mis Comentarios</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.drawerItem} onPress={() => { closeMenu(); navigation.navigate("Favoritos"); }}>
-                            <MaterialIcons name="favorite-border" size={22} color={COLORS.primary} />
+                            <MaterialIcons name="favorite-border" size={22} color={COLORS.primaryContenido} />
                             <Text style={styles.drawerText}>Favoritos</Text>
                         </TouchableOpacity>
                         <Text style={styles.drawerSectionTitle}>Tema</Text>
                         <TouchableOpacity style={[styles.themeOption, themeMode === "auto" && styles.themeOptionActive]} onPress={() => setThemeMode("auto")}>
-                            <MaterialIcons name="brightness-auto" size={22} color={COLORS.primary} />
+                            <MaterialIcons name="brightness-auto" size={22} color={COLORS.primarySuperDark} />
                             <Text style={styles.drawerText}>Automático</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.themeOption, themeMode === "light" && styles.themeOptionActive]} onPress={() => setThemeMode("light")}>
-                            <MaterialIcons name="light-mode" size={22} color={COLORS.primary} />
-                            <Text style={styles.drawerText}>Claro</Text>
+                            <MaterialIcons name="light-mode" size={22} color={COLORS.primarySuperDark} />
+                            <Text style={styles.drawerText} color={COLORS.primaryContenidoLight}>Claro</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.themeOption, themeMode === "dark" && styles.themeOptionActive]} onPress={() => setThemeMode("dark")}>
-                            <MaterialIcons name="dark-mode" size={22} color={COLORS.primary} />
+                            <MaterialIcons name="dark-mode" size={22} color={COLORS.primarySuperDark} />
                             <Text style={styles.drawerText}>Oscuro</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[globalStyles.btnPrimary, { marginTop: 30 }]} onPress={handleLogout}>
+                        <TouchableOpacity style={[globalStyles.btnPrimaryCerrar, { marginTop: 30 }]} onPress={handleLogout}>
                             <MaterialIcons name="logout" size={22} color={COLORS.blanco} />
                             <Text style={globalStyles.btnPrimaryText}>Cerrar sesión</Text>
                         </TouchableOpacity>
@@ -649,8 +649,8 @@ const styles = StyleSheet.create({
     overlay: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,0.35)", flexDirection: "row", justifyContent: "flex-end" },
     drawer: { width: 260, height: "100%", padding: 20, borderLeftWidth: 2, borderLeftColor: COLORS.primary },
     drawerTitle: { fontSize: 18, fontWeight: "bold", color: COLORS.primary, marginBottom: 20, textAlign: "center" },
-    drawerItem: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 12 },
-    drawerText: { fontSize: 15, color: COLORS.primary, fontWeight: "bold" },
+    drawerItem: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 12},
+    drawerText: { fontSize: 15, color: COLORS.primarySuperLight, fontWeight: "bold" },
     drawerSectionTitle: { marginTop: 15, fontSize: 14, fontWeight: "bold", color: COLORS.primary },
     themeOption: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 10, paddingHorizontal: 5, borderRadius: 10, marginTop: 8 },
     themeOptionActive: { backgroundColor: COLORS.primaryLight },
