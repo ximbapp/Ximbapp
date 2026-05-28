@@ -9,7 +9,20 @@ export const COLORS = {
     primaryLight: "rgba(230,0,126,0.1)",
     primaryMedium: "rgba(230,0,126,0.3)",
     primaryFade: "rgba(230,0,126,0.6)",
-
+    primarySuperLight: "rgb(124, 88, 206)",
+    primarySuperDark: "#0a79ad",
+    primaryContenido: "#2ba99f",
+    primaryContenidoLight: "rgb(207, 123, 79)",
+    primaryContenidoDark: "#d19d1b",
+    primaryUsuario: "rgb(197, 81, 19)",
+    primaryEditar: "rgb(224, 32, 32)",
+    primaryIconIdioma: "rgb(51, 139, 22)",
+    primaryIconNoti: "#FFD700",
+    primaryConfig: "#a78bfa",
+    prymarySol: "#fbbf24",
+    prymaryLuna: "#8b5cf6",
+    primaryletraConfig: "#fbbf24",
+  
     // Eventos (naranja)
     evento: "#ff6600",
     eventoLight: "rgba(255,102,0,0.1)",
@@ -49,6 +62,9 @@ export const COLORS = {
     gastronomiaColor: "#FF6347",
     aventuraColor: "#228B22",
     eventosColor: "#FF8C00",
+
+
+
 };
 
 // ─────────────────────────────────────────
@@ -141,11 +157,41 @@ export const globalStyles = StyleSheet.create({
         marginTop: Platform.OS === "web" ? 15 : 45,
         marginBottom: SPACING.xl,
     },
+    screenTitlePerfil: {
+        fontSize: FONTS.big,
+        fontWeight: "bold",
+        color: COLORS.primaryContenidoLight,
+        textAlign: "center",
+        marginTop: Platform.OS === "web" ? 15 : 45,
+        marginBottom: SPACING.xl,
+    },
+    screenTitleConfig: {
+        fontSize: FONTS.big,
+        fontWeight: "bold",
+        color: COLORS.primaryContenidoLight,
+        textAlign: "center",
+        marginTop: Platform.OS === "web" ? 15 : 45,
+        marginBottom: SPACING.xl,
+    },
 
     // ── Cards ──
     card: {
         borderWidth: 1,
         borderColor: COLORS.primary,
+        borderRadius: RADIUS.lg,
+        padding: SPACING.lg + 2,
+        marginBottom: SPACING.lg + 2,
+    },
+    cardDatosPersonales: {
+        borderWidth: 1,
+        borderColor: COLORS.primaryUsuario,
+        borderRadius: RADIUS.lg,
+        padding: SPACING.lg + 2,
+        marginBottom: SPACING.lg + 2,
+    },
+    cardConfiguracion: {
+        borderWidth: 1,
+        borderColor: COLORS.primaryConfig,
         borderRadius: RADIUS.lg,
         padding: SPACING.lg + 2,
         marginBottom: SPACING.lg + 2,
@@ -163,10 +209,44 @@ export const globalStyles = StyleSheet.create({
         marginBottom: 15,
         textAlign: "center",
     },
-
+    sectionTitleDatosPersonales: {
+        fontSize: FONTS.large,
+        fontWeight: "bold",
+        color: COLORS.primaryContenidoLight,
+        marginBottom: 15,
+        textAlign: "center",
+    },
+    sectionTitleConfig: {
+        fontSize: FONTS.large,
+        fontWeight: "bold",
+        color: COLORS.blanco,
+        marginBottom: 15,
+        textAlign: "center",
+    },
     // ── Botones ──
     btnPrimary: {
         backgroundColor: COLORS.primary,
+        paddingVertical: 14,
+        paddingHorizontal: SPACING.xl,
+        borderRadius: RADIUS.md,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: SPACING.sm,
+    },
+    btnPrimaryEditar: {
+        backgroundColor: COLORS.primaryUsuario,
+        paddingVertical: 14,
+        paddingHorizontal: SPACING.xl,
+        borderRadius: RADIUS.md,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: SPACING.sm,
+    },
+    
+    btnPrimaryCerrar: {
+        backgroundColor: COLORS.rojo,
         paddingVertical: 14,
         paddingHorizontal: SPACING.xl,
         borderRadius: RADIUS.md,
@@ -192,8 +272,42 @@ export const globalStyles = StyleSheet.create({
         borderWidth: 2,
         borderColor: COLORS.primary,
     },
+    btnOutlineCancelarEdit: {
+        backgroundColor: "transparent",
+        paddingVertical: 14,
+        paddingHorizontal: SPACING.xl,
+        borderRadius: RADIUS.md,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: SPACING.sm,
+        borderWidth: 2,
+        borderColor: COLORS.primaryEditar,
+    },
+    btnOutlineIcono: {
+        backgroundColor: "transparent",
+        paddingVertical: 14,
+        paddingHorizontal: SPACING.xl,
+        borderRadius: RADIUS.md,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: SPACING.sm,
+        borderWidth: 2,
+        borderColor: COLORS.primaryUsuario,
+    },
     btnOutlineText: {
         color: COLORS.primary,
+        fontWeight: "bold",
+        fontSize: FONTS.large,
+    },
+    btnOutlineTextIcono: {
+        color: COLORS.primaryContenidoLight,
+        fontWeight: "bold",
+        fontSize: FONTS.large,
+    },
+    btnOutlineTextCancelarEdit: {
+        color: COLORS.primaryEditar,
         fontWeight: "bold",
         fontSize: FONTS.large,
     },
@@ -235,19 +349,28 @@ export const globalStyles = StyleSheet.create({
         borderColor: COLORS.primary,
         marginTop: SPACING.xs,
     },
+    inputEditar: {
+        borderRadius: RADIUS.sm,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm + 2,
+        fontSize: FONTS.medium,
+        borderWidth: 1,
+        borderColor: COLORS.primaryContenidoDark,
+        marginTop: SPACING.xs,
+    },
     inputMultiline: {
         height: 80,
         textAlignVertical: "top",
     },
     label: {
         fontSize: FONTS.body,
-        color: COLORS.primary,
+        color: COLORS.primaryContenidoDark,
         marginTop: SPACING.sm + 2,
         fontWeight: "bold",
     },
     value: {
         fontSize: FONTS.medium,
-        color: COLORS.primary,
+        color: COLORS.primaryUsuario,
         marginTop: 2,
     },
 
@@ -304,7 +427,7 @@ export const globalStyles = StyleSheet.create({
         height: 110,
         borderRadius: 55,
         borderWidth: 3,
-        borderColor: COLORS.primary,
+        borderColor: COLORS.primaryContenidoDark,
         alignItems: "center",
         justifyContent: "center",
         marginBottom: SPACING.sm + 2,
@@ -327,11 +450,11 @@ export const globalStyles = StyleSheet.create({
     avatarNombre: {
         fontSize: FONTS.title,
         fontWeight: "bold",
-        color: COLORS.primary,
+        color: COLORS.primaryUsuario,
     },
     avatarEmail: {
         fontSize: FONTS.body,
-        color: COLORS.primary,
+        color: COLORS.primaryUsuario,
         opacity: 0.7,
         marginTop: 2,
     },

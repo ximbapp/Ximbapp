@@ -55,16 +55,18 @@ const DetalleEvento = ({ route, navigation }) => {
     const [comentarioFotos, setComentarioFotos] = useState([]);
     const [enviando, setEnviando] = useState(false);
     const [fotoComentarioZoom, setFotoComentarioZoom] = useState(null);
+    const [fotoEventoZoom, setFotoEventoZoom] = useState(false);
+    const [indexFotoZoom, setIndexFotoZoom] = useState(0);
     const [miAvatarId, setMiAvatarId] = useState("colibri");
     const [miColorAvatar, setMiColorAvatar] = useState(COLORS.avatarMorado);
 
-    // Estados edición comentario
+    // Estados edicion comentario
     const [editComentarioModal, setEditComentarioModal] = useState(false);
     const [comentarioEditando, setComentarioEditando] = useState(null);
     const [textoEditandoComentario, setTextoEditandoComentario] = useState("");
     const [guardandoComentario, setGuardandoComentario] = useState(false);
 
-    // Estados edición evento
+    // Estados edicion evento
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editNombre, setEditNombre] = useState("");
     const [editDescripcion, setEditDescripcion] = useState("");
@@ -80,6 +82,7 @@ const DetalleEvento = ({ route, navigation }) => {
     const [guardandoEdicion, setGuardandoEdicion] = useState(false);
 
     const flatListRef = useRef(null);
+    const zoomFlatListRef = useRef(null);
 
     const esMiEvento = miUsuarioId && evento.usuario?._id && evento.usuario._id === miUsuarioId;
 
@@ -108,7 +111,7 @@ const DetalleEvento = ({ route, navigation }) => {
     };
 
     const seleccionarFotosComentario = async () => {
-        if (comentarioFotos.length >= 2) { Alert.alert("Límite", "Máximo 2 fotos por comentario"); return; }
+        if (comentarioFotos.length >= 2) { Alert.alert("Limite", "Maximo 2 fotos por comentario"); return; }
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== "granted") { Alert.alert("Permiso", "Necesitamos permiso para acceder a tus fotos"); return; }
         const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsMultipleSelection: true, selectionLimit: 2 - comentarioFotos.length, quality: 0.7 });
@@ -142,7 +145,7 @@ const DetalleEvento = ({ route, navigation }) => {
     };
 
     const handleGuardarComentario = async () => {
-        if (!textoEditandoComentario.trim()) { Alert.alert("Error", "El comentario no puede estar vacío"); return; }
+        if (!textoEditandoComentario.trim()) { Alert.alert("Error", "El comentario no puede estar vacio"); return; }
         try {
             setGuardandoComentario(true);
             const token = await AsyncStorage.getItem("token");
@@ -162,7 +165,7 @@ const DetalleEvento = ({ route, navigation }) => {
     };
 
     const handleEliminarComentario = (item) => {
-        Alert.alert("Eliminar comentario", "¿Estás seguro que deseas eliminar este comentario?", [
+        Alert.alert("Eliminar comentario", "Esta seguro que deseas eliminar este comentario?", [
             { text: "Cancelar", style: "cancel" },
             {
                 text: "Eliminar", style: "destructive",
@@ -218,7 +221,7 @@ const DetalleEvento = ({ route, navigation }) => {
     };
 
     const handleEliminar = () => {
-        Alert.alert("Eliminar evento", `¿Estás seguro que deseas eliminar "${evento.nombre}"? Esta acción no se puede deshacer.`, [
+        Alert.alert("Eliminar evento", `Esta seguro que deseas eliminar "${evento.nombre}"? Esta accion no se puede deshacer.`, [
             { text: "Cancelar", style: "cancel" },
             {
                 text: "Eliminar", style: "destructive",
@@ -237,9 +240,9 @@ const DetalleEvento = ({ route, navigation }) => {
     const handleComoLlegar = () => {
         const lat = evento.coordenadas?.latitud || evento.lugar?.coordenadas?.latitud;
         const lng = evento.coordenadas?.longitud || evento.lugar?.coordenadas?.longitud;
-        if (!lat || !lng) { Alert.alert("Aviso", "Este evento no tiene ubicación registrada"); return; }
+        if (!lat || !lng) { Alert.alert("Aviso", "Este evento no tiene ubicacion registrada"); return; }
         if (Platform.OS === "web") { Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`); return; }
-        Alert.alert("¿Cómo quieres llegar?", "Selecciona una aplicación de navegación", [
+        Alert.alert("Como quieres llegar?", "Selecciona una aplicacion de navegacion", [
             { text: "Waze", onPress: () => Linking.openURL(`waze://?ll=${lat},${lng}&navigate=yes`).catch(() => Linking.openURL(`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`)) },
             { text: "Google Maps", onPress: () => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`) },
             { text: "Apple Maps", onPress: () => Linking.openURL(`maps://?daddr=${lat},${lng}`), ...(Platform.OS !== "ios" && { style: "destructive" }) },
@@ -249,9 +252,9 @@ const DetalleEvento = ({ route, navigation }) => {
 
     const handleCompartir = async () => {
         try {
-            await Share.share({ 
-                message: `${evento.nombre}\n${formatFecha(evento.fechaInicio)}${evento.fechaFinal ? ` - ${formatFecha(evento.fechaFinal)}` : ''}\n\nDescubierto en Ximbapp\nhttps://ximbapp.com`, 
-                title: evento.nombre 
+            await Share.share({
+                message: `${evento.nombre}\n${formatFecha(evento.fechaInicio)}${evento.fechaFinal ? ` - ${formatFecha(evento.fechaFinal)}` : ''}\n\nDescubierto en Ximbapp\nhttps://ximbapp.com`,
+                title: evento.nombre
             });
         } catch (error) { console.log(error); }
     };
@@ -276,15 +279,29 @@ const DetalleEvento = ({ route, navigation }) => {
             {evento.fotos && evento.fotos.length > 0 ? (
                 <View style={styles.carruselContainer}>
                     <FlatList
-                        data={evento.fotos} horizontal pagingEnabled showsHorizontalScrollIndicator={false}
+                        data={evento.fotos}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
                         onScroll={(e) => setFotoActiva(Math.round(e.nativeEvent.contentOffset.x / width))}
                         keyExtractor={(_, index) => index.toString()}
-                        renderItem={({ item }) => <Image source={{ uri: item }} style={[styles.fotoCarrusel, { width }]} />}
+                        renderItem={({ item, index }) => (
+                            <TouchableOpacity onPress={() => {
+                                setIndexFotoZoom(index);
+                                setFotoEventoZoom(true);
+                            }} activeOpacity={0.9}>
+                                <Image source={{ uri: item }} style={[styles.fotoCarrusel, { width }]} />
+                            </TouchableOpacity>
+                        )}
                     />
                     <View style={styles.indicadores}>
                         {evento.fotos.map((_, index) => (
                             <View key={index} style={[styles.indicador, { backgroundColor: index === fotoActiva ? COLORS.evento : "rgba(255,255,255,0.5)" }]} />
                         ))}
+                    </View>
+                    <View style={styles.zoomHint}>
+                        <MaterialIcons name="zoom-in" size={16} color="rgba(255,255,255,0.8)" />
+                        <Text style={styles.zoomHintText}>Toca para ampliar</Text>
                     </View>
                 </View>
             ) : (
@@ -294,7 +311,6 @@ const DetalleEvento = ({ route, navigation }) => {
                 </View>
             )}
 
-            {/* Pestañas */}
             <View style={[styles.pestanas, { backgroundColor: isDark ? COLORS.darkBg : COLORS.lightBg }]}>
                 <TouchableOpacity style={[styles.pestana, pestanaActiva === "info" && styles.pestanaActiva]} onPress={() => setPestanaActiva("info")}>
                     <Text style={[styles.pestanaText, pestanaActiva === "info" && styles.pestanaTextActiva]}>Info</Text>
@@ -341,7 +357,7 @@ const DetalleEvento = ({ route, navigation }) => {
                             ) : null}
                             {evento.descripcion ? (
                                 <View style={styles.descripcionContainer}>
-                                    <Text style={styles.infoLabel}>Descripción:</Text>
+                                    <Text style={styles.infoLabel}>Descripcion:</Text>
                                     <Text style={styles.descripcionText}>{evento.descripcion}</Text>
                                 </View>
                             ) : null}
@@ -361,7 +377,7 @@ const DetalleEvento = ({ route, navigation }) => {
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.boton, { backgroundColor: COLORS.evento }]} onPress={handleComoLlegar}>
                                 <MaterialIcons name="directions" size={22} color={COLORS.blanco} />
-                                <Text style={[styles.botonText, { color: COLORS.blanco }]}>Cómo llegar</Text>
+                                <Text style={[styles.botonText, { color: COLORS.blanco }]}>Como llegar</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -424,7 +440,7 @@ const DetalleEvento = ({ route, navigation }) => {
                                     </TouchableOpacity>
                                 </View>
                             }
-                            ListEmptyComponent={<Text style={styles.sinComentarios}>No hay comentarios aún. Se el primero.</Text>}
+                            ListEmptyComponent={<Text style={styles.sinComentarios}>No hay comentarios aun. Se el primero.</Text>}
                             renderItem={({ item }) => {
                                 const esMiComentario = miUsuarioId && item.usuario?._id && item.usuario._id === miUsuarioId;
                                 return (
@@ -524,7 +540,7 @@ const DetalleEvento = ({ route, navigation }) => {
                             </TouchableOpacity>
                             {showPickerHoraFin && (<DateTimePicker value={editHoraFin} mode="time" is24Hour={false} display={Platform.OS === "ios" ? "spinner" : "default"} onChange={(e, date) => { setShowPickerHoraFin(false); if (date) setEditHoraFin(date); }} />)}
                             <TextInput style={[styles.input, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard, color: COLORS.evento }]} placeholder="Costo (0 si es gratis)" placeholderTextColor={COLORS.eventoMedium} value={editCostos} onChangeText={setEditCostos} keyboardType="numeric" />
-                            <TextInput style={[styles.input, globalStyles.inputMultiline, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard, color: COLORS.evento }]} placeholder="Descripción" placeholderTextColor={COLORS.eventoMedium} value={editDescripcion} onChangeText={setEditDescripcion} multiline numberOfLines={3} />
+                            <TextInput style={[styles.input, globalStyles.inputMultiline, { backgroundColor: isDark ? COLORS.darkCard : COLORS.lightCard, color: COLORS.evento }]} placeholder="Descripcion" placeholderTextColor={COLORS.eventoMedium} value={editDescripcion} onChangeText={setEditDescripcion} multiline numberOfLines={3} />
                             <TouchableOpacity style={[styles.saveButton, guardandoEdicion && { opacity: 0.7 }]} onPress={handleGuardarEdicion} disabled={guardandoEdicion}>
                                 <Text style={styles.enviarBtnText}>{guardandoEdicion ? "Guardando..." : "Guardar cambios"}</Text>
                             </TouchableOpacity>
@@ -542,6 +558,35 @@ const DetalleEvento = ({ route, navigation }) => {
                     {fotoComentarioZoom && <Image source={{ uri: fotoComentarioZoom }} style={styles.fotoZoom} resizeMode="contain" />}
                 </View>
             </Modal>
+
+            {/* Modal zoom fotos del evento con scroll */}
+            <Modal visible={fotoEventoZoom} transparent animationType="fade" onRequestClose={() => setFotoEventoZoom(false)}>
+                <View style={styles.modalZoom}>
+                    <TouchableOpacity style={styles.modalCerrar} onPress={() => setFotoEventoZoom(false)}>
+                        <MaterialIcons name="close" size={30} color={COLORS.blanco} />
+                    </TouchableOpacity>
+                    <FlatList
+                        ref={zoomFlatListRef}
+                        data={evento.fotos}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        initialScrollIndex={indexFotoZoom}
+                        getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+                        keyExtractor={(_, index) => index.toString()}
+                        onScroll={(e) => setIndexFotoZoom(Math.round(e.nativeEvent.contentOffset.x / width))}
+                        renderItem={({ item }) => (
+                            <Image source={{ uri: item }} style={{ width, height: "80%" }} resizeMode="contain" />
+                        )}
+                    />
+                    <View style={styles.indicadoresZoom}>
+                        {evento.fotos && evento.fotos.map((_, index) => (
+                            <View key={index} style={[styles.indicador, { backgroundColor: index === indexFotoZoom ? COLORS.blanco : "rgba(255,255,255,0.4)" }]} />
+                        ))}
+                    </View>
+                </View>
+            </Modal>
+
         </View>
     );
 };
@@ -556,6 +601,9 @@ const styles = StyleSheet.create({
     fotoCarrusel: { height: 220, resizeMode: "cover" },
     indicadores: { position: "absolute", bottom: 10, flexDirection: "row", alignSelf: "center", gap: 6 },
     indicador: { width: 8, height: 8, borderRadius: 4 },
+    zoomHint: { position: "absolute", bottom: 10, right: 12, flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "rgba(0,0,0,0.4)", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+    zoomHintText: { color: "rgba(255,255,255,0.8)", fontSize: 11 },
+    indicadoresZoom: { position: "absolute", bottom: 30, flexDirection: "row", alignSelf: "center", gap: 6 },
     sinFotos: { height: 150, alignItems: "center", justifyContent: "center", borderBottomWidth: 1, borderBottomColor: COLORS.evento },
     sinFotosText: { color: COLORS.evento, marginTop: 8, fontSize: 14 },
     pestanas: { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: COLORS.evento },

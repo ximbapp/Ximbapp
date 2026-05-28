@@ -15,7 +15,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import FloatingInput from "../components/FloatingInput";
 import { ThemeContext } from "../context/ThemeContext";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { globalStyles, COLORS } from "../theme/styles";
 
@@ -40,12 +40,25 @@ const Registro = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [terminosAceptados, setTerminosAceptados] = useState(false);
     const [modalTerminos, setModalTerminos] = useState(false);
+    const [mostrarPassword, setMostrarPassword] = useState(false);
+    const [mostrarConfirmPassword, setMostrarConfirmPassword] = useState(false);
 
     const validarSoloLetras = (texto) => /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(texto);
     const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const validarTelefono = (tel) => /^[0-9]{10}$/.test(tel);
     const validarCodigoPostal = (cp) => /^[0-9]{5}$/.test(cp);
     const validarPasswordSegura = (pass) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#._-])[A-Za-z\d@$!%*?&#._-]{8,}$/.test(pass);
+
+    const validarEdadMinima = (fecha) => {
+        if (!fecha) return false;
+        const hoy = new Date();
+        const edad = hoy.getFullYear() - fecha.getFullYear();
+        const mes = hoy.getMonth() - fecha.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) {
+            return edad - 1 >= 18;
+        }
+        return edad >= 18;
+    };
 
     const formatFecha = (date) => {
         if (!date) return "";
@@ -65,28 +78,50 @@ const Registro = ({ navigation }) => {
 
     const handleRegister = async () => {
         let newErrors = {};
-        if (nombre.trim() === "") newErrors.nombre = "El nombre es obligatorio";
+
+        if (!nombre.trim()) newErrors.nombre = "El nombre es obligatorio";
         else if (!validarSoloLetras(nombre.trim())) newErrors.nombre = "El nombre solo debe contener letras";
-        if (apellido_pa.trim() === "") newErrors.apellido_pa = "El apellido paterno es obligatorio";
-        else if (!validarSoloLetras(apellido_pa.trim())) newErrors.apellido_pa = "El apellido paterno solo debe contener letras";
-        if (apellido_ma.trim() !== "" && !validarSoloLetras(apellido_ma.trim())) newErrors.apellido_ma = "El apellido materno solo debe contener letras";
-        if (!fechaNacimiento) newErrors.fechaNacimiento = "Selecciona tu fecha de nacimiento";
-        if (codigo_postal.trim() === "") newErrors.codigo_postal = "El código postal es obligatorio";
+
+        if (!apellido_pa.trim()) newErrors.apellido_pa = "El apellido paterno es obligatorio";
+        else if (!validarSoloLetras(apellido_pa.trim())) newErrors.apellido_pa = "Solo debe contener letras";
+
+        if (apellido_ma.trim() !== "" && !validarSoloLetras(apellido_ma.trim())) newErrors.apellido_ma = "Solo debe contener letras";
+
+        if (!fechaNacimiento) {
+            newErrors.fechaNacimiento = "Selecciona tu fecha de nacimiento";
+        } else if (!validarEdadMinima(fechaNacimiento)) {
+            newErrors.fechaNacimiento = "Debes tener al menos 18 años para registrarte";
+        }
+
+        if (!codigo_postal.trim()) newErrors.codigo_postal = "El código postal es obligatorio";
         else if (!validarCodigoPostal(codigo_postal.trim())) newErrors.codigo_postal = "Debe contener exactamente 5 números";
-        if (nacionalidad.trim() === "") newErrors.nacionalidad = "La nacionalidad es obligatoria";
-        if (localidad.trim() === "") newErrors.localidad = "La localidad es obligatoria";
-        if (genero.trim() === "") newErrors.genero = "Selecciona una opción";
-        if (telefono.trim() === "") newErrors.telefono = "El teléfono es obligatorio";
+
+        if (!nacionalidad.trim()) newErrors.nacionalidad = "La nacionalidad es obligatoria";
+        else if (!validarSoloLetras(nacionalidad.trim())) newErrors.nacionalidad = "Solo debe contener letras";
+
+        if (!localidad.trim()) newErrors.localidad = "La localidad es obligatoria";
+
+        if (!genero.trim()) newErrors.genero = "Selecciona una opción";
+
+        if (!telefono.trim()) newErrors.telefono = "El teléfono es obligatorio";
         else if (!validarTelefono(telefono.trim())) newErrors.telefono = "Debe contener exactamente 10 dígitos";
-        if (usuario.trim() === "") newErrors.usuario = "El usuario es obligatorio";
+
+        if (!usuario.trim()) newErrors.usuario = "El usuario es obligatorio";
         else if (usuario.trim().length < 4) newErrors.usuario = "Debe tener mínimo 4 caracteres";
-        if (correo.trim() === "") newErrors.correo = "El correo es obligatorio";
+        else if (usuario.trim().length > 20) newErrors.usuario = "Debe tener máximo 20 caracteres";
+        else if (/\s/.test(usuario.trim())) newErrors.usuario = "El usuario no puede contener espacios";
+
+        if (!correo.trim()) newErrors.correo = "El correo es obligatorio";
         else if (!validarEmail(correo.trim())) newErrors.correo = "Formato inválido (ejemplo@correo.com)";
-        if (password.trim() === "") newErrors.password = "La contraseña es obligatoria";
-        else if (!validarPasswordSegura(password)) newErrors.password = "Mínimo 8 caracteres, mayúscula, minúscula, número y símbolo";
-        if (confirmPassword.trim() === "") newErrors.confirmPassword = "Confirma tu contraseña";
+
+        if (!password.trim()) newErrors.password = "La contraseña es obligatoria";
+        else if (!validarPasswordSegura(password)) newErrors.password = "Mínimo 8 caracteres, mayúscula, minúscula, número y símbolo (@$!%*?&#._-)";
+
+        if (!confirmPassword.trim()) newErrors.confirmPassword = "Confirma tu contraseña";
         else if (password !== confirmPassword) newErrors.confirmPassword = "Las contraseñas no coinciden";
+
         if (!terminosAceptados) newErrors.terminos = "Debes aceptar los términos y condiciones";
+
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
@@ -96,10 +131,18 @@ const Registro = ({ navigation }) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    nombre: nombre.trim(), apellidoP: apellido_pa.trim(), apellidoM: apellido_ma.trim(),
-                    fechaNacimiento: fechaNacimiento.toISOString(), nacionalidad: nacionalidad.trim(),
-                    codigoPostal: codigo_postal.trim(), alcaldiaMunicipio: localidad.trim(),
-                    genero, telefono: telefono.trim(), email: correo.trim(), password, terminosAceptados: true,
+                    nombre: nombre.trim(),
+                    apellidoP: apellido_pa.trim(),
+                    apellidoM: apellido_ma.trim(),
+                    fechaNacimiento: fechaNacimiento.toISOString(),
+                    nacionalidad: nacionalidad.trim(),
+                    codigoPostal: codigo_postal.trim(),
+                    alcaldiaMunicipio: localidad.trim(),
+                    genero,
+                    telefono: telefono.trim(),
+                    email: correo.trim().toLowerCase(),
+                    password,
+                    terminosAceptados: true,
                 })
             });
             const data = await response.json();
@@ -107,12 +150,18 @@ const Registro = ({ navigation }) => {
                 alert("Cuenta creada correctamente. Revisa tu correo para confirmarla.");
                 navigation.goBack();
             } else {
-                if (data.mensaje.includes("email")) setErrors({ correo: "Este correo ya está registrado" });
-                else if (data.mensaje.includes("telefono")) setErrors({ telefono: "Este teléfono ya está registrado" });
-                else alert(data.mensaje);
+                if (data.mensaje?.includes("correo") || data.mensaje?.includes("email")) {
+                    setErrors({ correo: "Este correo ya está registrado" });
+                } else if (data.mensaje?.includes("teléfono") || data.mensaje?.includes("telefono")) {
+                    setErrors({ telefono: "Este teléfono ya está registrado" });
+                } else if (data.mensaje?.includes("usuario")) {
+                    setErrors({ usuario: "Este usuario ya está en uso" });
+                } else {
+                    alert(data.mensaje || "Error al crear la cuenta");
+                }
             }
         } catch (error) {
-            alert("Error de conexión con el servidor");
+            alert("Sin conexión. Verifica tu internet e intenta de nuevo.");
         } finally {
             setLoading(false);
         }
@@ -138,6 +187,7 @@ const Registro = ({ navigation }) => {
                                 <Text style={styles.selectLabel}>Fecha de nacimiento</Text>
                                 <input
                                     type="date"
+                                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
                                     onChange={(e) => {
                                         if (e.target.value) { setFechaNacimiento(new Date(e.target.value)); clearError("fechaNacimiento"); }
                                     }}
@@ -157,12 +207,18 @@ const Registro = ({ navigation }) => {
                 </TouchableOpacity>
 
                 {showPicker && Platform.OS !== "web" && (
-                    <DateTimePicker value={fechaNacimiento || new Date(2000, 0, 1)} mode="date" display={Platform.OS === "ios" ? "spinner" : "default"} maximumDate={new Date()} onChange={handleFechaChange} />
+                    <DateTimePicker
+                        value={fechaNacimiento || new Date(2000, 0, 1)}
+                        mode="date"
+                        display={Platform.OS === "ios" ? "spinner" : "default"}
+                        maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
+                        onChange={handleFechaChange}
+                    />
                 )}
 
                 <FloatingInput label="Código Postal" value={codigo_postal} onChangeText={(t) => { setCodigo_postal(t.replace(/[^0-9]/g, "")); clearError("codigo_postal"); }} isDark={isDark} error={errors.codigo_postal} keyboardType="numeric" maxLength={5} />
                 <FloatingInput label="Nacionalidad" value={nacionalidad} onChangeText={(t) => { setNacionalidad(t); clearError("nacionalidad"); }} isDark={isDark} error={errors.nacionalidad} />
-                <FloatingInput label="Localidad" value={localidad} onChangeText={(t) => { setLocalidad(t); clearError("localidad"); }} isDark={isDark} error={errors.localidad} />
+                <FloatingInput label="Localidad / Alcaldía" value={localidad} onChangeText={(t) => { setLocalidad(t); clearError("localidad"); }} isDark={isDark} error={errors.localidad} />
 
                 <Text style={styles.selectLabel}>Género</Text>
                 <View style={[styles.selectContainer, { borderBottomColor: errors.genero ? "#ff3b30" : COLORS.primary }]}>
@@ -193,11 +249,39 @@ const Registro = ({ navigation }) => {
                 </View>
                 {errors.genero ? <Text style={styles.errorText}>{errors.genero}</Text> : null}
 
-                <FloatingInput label="Teléfono" value={telefono} onChangeText={(t) => { setTelefono(t.replace(/[^0-9]/g, "")); clearError("telefono"); }} isDark={isDark} error={errors.telefono} keyboardType="numeric" maxLength={10} />
-                <FloatingInput label="Usuario" value={usuario} onChangeText={(t) => { setUsuario(t); clearError("usuario"); }} isDark={isDark} error={errors.usuario} />
-                <FloatingInput label="Correo" value={correo} onChangeText={(t) => { setCorreo(t); clearError("correo"); }} isDark={isDark} error={errors.correo} keyboardType="email-address" />
-                <FloatingInput label="Contraseña" value={password} onChangeText={(t) => { setPassword(t); clearError("password"); }} secureTextEntry isDark={isDark} error={errors.password} />
-                <FloatingInput label="Confirmar contraseña" value={confirmPassword} onChangeText={(t) => { setConfirmPassword(t); clearError("confirmPassword"); }} secureTextEntry isDark={isDark} error={errors.confirmPassword} />
+                <FloatingInput label="Teléfono (10 dígitos)" value={telefono} onChangeText={(t) => { setTelefono(t.replace(/[^0-9]/g, "")); clearError("telefono"); }} isDark={isDark} error={errors.telefono} keyboardType="numeric" maxLength={10} />
+                <FloatingInput label="Usuario" value={usuario} onChangeText={(t) => { setUsuario(t.replace(/\s/g, "")); clearError("usuario"); }} isDark={isDark} error={errors.usuario} autoCapitalize="none" />
+                <FloatingInput label="Correo electrónico" value={correo} onChangeText={(t) => { setCorreo(t); clearError("correo"); }} isDark={isDark} error={errors.correo} keyboardType="email-address" autoCapitalize="none" />
+
+                {/* Contraseña con ojito */}
+                <View style={styles.passwordContainer}>
+                    <FloatingInput
+                        label="Contraseña"
+                        value={password}
+                        onChangeText={(t) => { setPassword(t); clearError("password"); }}
+                        secureTextEntry={!mostrarPassword}
+                        isDark={isDark}
+                        error={errors.password}
+                    />
+                    <TouchableOpacity style={styles.ojito} onPress={() => setMostrarPassword(!mostrarPassword)}>
+                        <Ionicons name={mostrarPassword ? "eye-off-outline" : "eye-outline"} size={22} color={COLORS.primary} />
+                    </TouchableOpacity>
+                </View>
+
+                {/* Confirmar contraseña con ojito */}
+                <View style={styles.passwordContainer}>
+                    <FloatingInput
+                        label="Confirmar contraseña"
+                        value={confirmPassword}
+                        onChangeText={(t) => { setConfirmPassword(t); clearError("confirmPassword"); }}
+                        secureTextEntry={!mostrarConfirmPassword}
+                        isDark={isDark}
+                        error={errors.confirmPassword}
+                    />
+                    <TouchableOpacity style={styles.ojito} onPress={() => setMostrarConfirmPassword(!mostrarConfirmPassword)}>
+                        <Ionicons name={mostrarConfirmPassword ? "eye-off-outline" : "eye-outline"} size={22} color={COLORS.primary} />
+                    </TouchableOpacity>
+                </View>
 
                 {/* Checkbox Términos */}
                 <View style={styles.terminosRow}>
@@ -298,4 +382,6 @@ const styles = StyleSheet.create({
     tcSeccion: { fontSize: 13, fontWeight: "bold", color: COLORS.primary, marginTop: 16, marginBottom: 8, textDecorationLine: "underline" },
     tcSubtitulo: { fontSize: 12, fontWeight: "bold", color: COLORS.primary, marginTop: 12, marginBottom: 4 },
     tcTexto: { fontSize: 12, color: COLORS.primary, lineHeight: 18, opacity: 0.85 },
+    passwordContainer: { position: "relative", justifyContent: "center" },
+    ojito: { position: "absolute", right: 10, top: "35%", zIndex: 10, padding: 5 },
 });

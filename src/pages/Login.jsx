@@ -28,6 +28,7 @@ const Login = ({ navigation }) => {
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [mostrarPassword, setMostrarPassword] = useState(false);
 
     const validarEmail = (correo) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,9 +39,19 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         let newErrors = {};
-        if (email.trim() === "") newErrors.email = "El correo es obligatorio";
-        else if (!validarEmail(email.trim())) newErrors.email = "Ingresa un correo válido (ejemplo@correo.com)";
-        if (password.trim() === "") newErrors.password = "La contraseña es obligatoria";
+
+        if (!email.trim()) {
+            newErrors.email = "El correo es obligatorio";
+        } else if (!validarEmail(email.trim())) {
+            newErrors.email = "Ingresa un correo válido (ejemplo@correo.com)";
+        }
+
+        if (!password.trim()) {
+            newErrors.password = "La contraseña es obligatoria";
+        } else if (password.length < 6) {
+            newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+        }
+
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
@@ -49,7 +60,7 @@ const Login = ({ navigation }) => {
             const response = await fetch('https://ximbapp.com/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.trim(), password })
+                body: JSON.stringify({ email: email.trim().toLowerCase(), password })
             });
             const data = await response.json();
             if (response.ok) {
@@ -57,10 +68,18 @@ const Login = ({ navigation }) => {
                 await AsyncStorage.setItem('usuario', JSON.stringify(data.usuario));
                 navigation.replace("Home");
             } else {
-                setErrors({ email: data.mensaje, password: data.mensaje });
+                if (data.mensaje?.includes('confirmar')) {
+                    setErrors({ email: "Debes confirmar tu cuenta. Revisa tu correo." });
+                } else if (data.mensaje?.includes('contraseña') || data.mensaje?.includes('incorrectos')) {
+                    setErrors({ password: "Correo o contraseña incorrectos" });
+                } else if (data.mensaje?.includes('correo')) {
+                    setErrors({ email: "No existe una cuenta con ese correo" });
+                } else {
+                    setErrors({ password: data.mensaje || "Error al iniciar sesión" });
+                }
             }
         } catch (error) {
-            setErrors({ email: "Error de conexión con el servidor" });
+            setErrors({ email: "Sin conexión. Verifica tu internet e intenta de nuevo." });
         } finally {
             setLoading(false);
         }
@@ -81,18 +100,46 @@ const Login = ({ navigation }) => {
                 </Text>
 
                 <FloatingInput
-                    label="Email" value={email}
+                    label="Correo electrónico"
+                    value={email}
                     onChangeText={(text) => { setEmail(text); clearError("email"); }}
-                    isDark={isDark} error={errors.email} keyboardType="email-address"
-                />
-                <FloatingInput
-                    label="Contraseña" value={password}
-                    onChangeText={(text) => { setPassword(text); clearError("password"); }}
-                    secureTextEntry isDark={isDark} error={errors.password}
+                    isDark={isDark}
+                    error={errors.email}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                 />
 
-                <TouchableOpacity style={[globalStyles.btnPrimary, { marginTop: 35 }, loading && { opacity: 0.7 }]} onPress={handleLogin} disabled={loading}>
-                    <Text style={globalStyles.btnPrimaryText}>{loading ? "Entrando..." : "Entrar"}</Text>
+                {/* Campo contraseña con ojito */}
+                <View style={styles.passwordContainer}>
+                    <FloatingInput
+                        label="Contraseña"
+                        value={password}
+                        onChangeText={(text) => { setPassword(text); clearError("password"); }}
+                        secureTextEntry={!mostrarPassword}
+                        isDark={isDark}
+                        error={errors.password}
+                        style={{ flex: 1 }}
+                    />
+                    <TouchableOpacity
+                        style={styles.ojito}
+                        onPress={() => setMostrarPassword(!mostrarPassword)}
+                    >
+                        <Ionicons
+                            name={mostrarPassword ? "eye-off-outline" : "eye-outline"}
+                            size={22}
+                            color={COLORS.primary}
+                        />
+                    </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity
+                    style={[globalStyles.btnPrimary, { marginTop: 35 }, loading && { opacity: 0.7 }]}
+                    onPress={handleLogin}
+                    disabled={loading}
+                >
+                    <Text style={globalStyles.btnPrimaryText}>
+                        {loading ? "Entrando..." : "Entrar"}
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate("OlvidePassword")}>
@@ -172,6 +219,17 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         marginBottom: 20,
         resizeMode: "contain",
+    },
+    passwordContainer: {
+        position: "relative",
+        justifyContent: "center",
+    },
+    ojito: {
+        position: "absolute",
+        right: 10,
+        top: "35%",
+        zIndex: 10,
+        padding: 5,
     },
     downloadButton: {
         flexDirection: "row",
